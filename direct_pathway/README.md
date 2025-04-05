@@ -47,13 +47,13 @@ The simulation systematically varies $\pi$ and $\theta$ to explore how group siz
 
 4. Calculate disparity measures:
    - Rate-based measures:
-     - $\text{DisparityRatio} = \frac{\text{GroupRate}_{disadv}}{\text{GroupRate}_{adv}} = \frac{1 + \theta \cdot \frac{1-\pi}{\pi}}{1-\theta}$
-     - $\text{DisparityDifference} = \text{GroupRate}_{disadv} - \text{GroupRate}_{adv} = \text{avgRate} \cdot \left(\theta \cdot \frac{1-\pi}{\pi} + \theta\right)$
+     - DisparityRatio = $\frac{\text{GroupRate}_{disadv}}{\text{GroupRate}_{adv}} = \frac{1 + \theta \cdot \frac{1-\pi}{\pi}}{1-\theta}$
+     - DisparityDifference = $\text{GroupRate}_{disadv} - \text{GroupRate}_{adv} = \text{avgRate} \cdot \left(\theta \cdot \frac{1-\pi}{\pi} + \theta\right)$
    
    - Odds-based measures (converting rates to probabilities if necessary):
      - $\text{Odds}_{disadv} = \frac{\text{GroupRate}_{disadv}}{1 - \text{GroupRate}_{disadv}}$
      - $\text{Odds}_{adv} = \frac{\text{GroupRate}_{adv}}{1 - \text{GroupRate}_{adv}}$
-     - $\text{OddsRatio} = \frac{\text{Odds}_{disadv}}{\text{Odds}_{adv}}$
+     - OddsRatio = $\frac{\text{Odds}_{disadv}}{\text{Odds}_{adv}}$
 
 5. Analyze how disparity measures vary with:
    - Group size proportions ($\pi$)

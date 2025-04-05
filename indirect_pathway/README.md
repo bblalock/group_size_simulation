@@ -45,18 +45,18 @@ The simulation systematically varies $\pi$ and $\gamma$ to explore how group siz
    - For each individual $i$ with economic position $p_i$: $\text{Rate}_i = \text{IncarcerationRate}(maxRate, p_i, \gamma)$
 
 4. Aggregate to calculate group-level rates:
-   - $\text{GroupRate}_{disadv} = \frac{1}{n_{disadv}} \sum_{i=1}^{n_{disadv}} \text{Rate}_i$
-   - $\text{GroupRate}_{adv} = \frac{1}{n_{adv}} \sum_{j=1}^{n_{adv}} \text{Rate}_j$
+   - For disadvantaged group: $\text{GroupRate}_{disadv} = \frac{1}{n_{disadv}} \sum_{i=1}^{n_{disadv}} \text{Rate}_i$
+   - For advantaged group: $\text{GroupRate}_{adv} = \frac{1}{n_{adv}} \sum_{j=1}^{n_{adv}} \text{Rate}_j$
 
 5. Calculate disparity measures:
    - Rate-based measures:
-     - $\text{DisparityRatio} = \frac{\text{GroupRate}_{disadv}}{\text{GroupRate}_{adv}}$
-     - $\text{DisparityDifference} = \text{GroupRate}_{disadv} - \text{GroupRate}_{adv}$
+     - DisparityRatio = $\frac{\text{GroupRate}_{disadv}}{\text{GroupRate}_{adv}}$
+     - DisparityDifference = $\text{GroupRate}_{disadv} - \text{GroupRate}_{adv}$
    
    - Odds-based measures (converting rates to probabilities if necessary):
      - $\text{Odds}_{disadv} = \frac{\text{GroupRate}_{disadv}}{1 - \text{GroupRate}_{disadv}}$
      - $\text{Odds}_{adv} = \frac{\text{GroupRate}_{adv}}{1 - \text{GroupRate}_{adv}}$
-     - $\text{OddsRatio} = \frac{\text{Odds}_{disadv}}{\text{Odds}_{adv}}$
+     - OddsRatio = $\frac{\text{Odds}_{disadv}}{\text{Odds}_{adv}}$
 
 6. Analyze how disparity measures vary with:
    - Group size proportions ($\pi$)
