@@ -1,192 +1,140 @@
 import numpy as np
 import pandas as pd
-import plotly.express as px
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
 
-def group_effect(is_disadvantaged, theta, pi):
+from models.direct_effect import incarceration_rate
+from analysis.disparity_measures import calculate_disparity_measures
+from visualization.plots import plot_explanatory_simulation
+from utils.io import save_figure, save_simulation_data
+
+def create_explanatory_simulation_data(thetas, pi_values, avg_rate=200):
     """
-    Calculate group effect where:
-    - theta = 0: Both groups equal to population average
-    - theta = 1: Advantaged group at 0, disadvantaged group carries the full population average
-    - Population average is maintained at 1 for all theta values
+    Create simulation data for the explanatory simulation with fixed average rate.
     
     Parameters:
-    - is_disadvantaged: Boolean, True for disadvantaged group
-    - theta: Float between 0 and 1, controls disparity
-    - pi: Proportion of population in disadvantaged group
-    
-    Returns: Multiplier for the group's incarceration rate
+    -----------
+    thetas : list or array
+        Disparity parameter values
+    pi_values : list or array
+        Group proportion values
+    avg_rate : float, default=200
+        Fixed average incarceration rate per 100,000
+        
+    Returns:
+    --------
+    pd.DataFrame
+        DataFrame containing simulation results
     """
-    if is_disadvantaged:
-        # When theta=1, this equals 1/pi to ensure population average
-        return 1 + theta * ((1 - pi) / pi)
-    else:
-        # When theta=1, this equals 0
-        return 1 - theta
-
-# Parameters to explore
-thetas = np.linspace(0, 1, 5)
-pi_values = np.linspace(.1, .9, 3)
-avg_rate = 200  # Maximum incarceration rate
-
-# Calculate rates for all pi values
-data = []
-for pi in pi_values:
-    for theta in thetas:
-        # Calculate effects
-        effect_disadv = group_effect(True, theta, pi)
-        effect_adv = group_effect(False, theta, pi)
-        
-        # Calculate rates (using pure group effect, α=1)
-        rate_disadv = avg_rate * effect_disadv
-        rate_adv = avg_rate * effect_adv
-        
-        # Calculate population average
-        pop_avg = pi * rate_disadv + (1 - pi) * rate_adv
-        
-        # Calculate disparity metrics
-        disparity_diff = rate_disadv - rate_adv
-        disparity_ratio = rate_disadv / rate_adv if rate_adv > 0 else float('inf')
-        
-        # Calculate odds and odds ratio
-        # Assuming rates are per 100,000 population
-        odds_disadv = rate_disadv / (100000 - rate_disadv) if rate_disadv < 100000 else float('inf')
-        odds_adv = rate_adv / (100000 - rate_adv) if rate_adv < 100000 else float('inf')
-        odds_ratio = odds_disadv / odds_adv if odds_adv > 0 else float('inf')
-        
-        # Add to data
-        data.append({
-            "theta": theta, 
-            "Group": "Disadvantaged", 
-            "Rate": rate_disadv, 
-            "pi": pi,
-            "Disparity Difference": disparity_diff,
-            "Disparity Ratio": disparity_ratio,
-            "Odds": odds_disadv,
-            "Odds Ratio": odds_ratio
-        })
-        data.append({
-            "theta": theta, 
-            "Group": "Advantaged", 
-            "Rate": rate_adv, 
-            "pi": pi,
-            "Disparity Difference": disparity_diff,
-            "Disparity Ratio": disparity_ratio,
-            "Odds": odds_adv,
-            "Odds Ratio": odds_ratio
-        })
-        data.append({
-            "theta": theta, 
-            "Group": "Population Average", 
-            "Rate": pop_avg, 
-            "pi": pi,
-            "Disparity Difference": disparity_diff,
-            "Disparity Ratio": disparity_ratio,
-            "Odds": pop_avg / (100000 - pop_avg) if pop_avg < 100000 else float('inf'),
-            "Odds Ratio": odds_ratio
-        })
-
-# Create DataFrame
-df = pd.DataFrame(data)
-
-# Create figure with subplots
-fig = make_subplots(
-    rows=len(pi_values), 
-    cols=2,
-    subplot_titles=[f"π = {pi}" for pi in pi_values for _ in range(2)],
-    specs=[[{"type": "bar"}, {"type": "table"}] for _ in range(len(pi_values))],
-    horizontal_spacing=0.05,
-    vertical_spacing=0.1
-)
-
-# Add bar charts to left column
-for i, pi in enumerate(pi_values):
-    # Filter data for this pi value
-    pi_data = df[(df["pi"] == pi) & (df["Group"] != "Population Average")]
+    # Store simulation results
+    data = []
     
-    # Add grouped bar chart
-    for group in ["Disadvantaged", "Advantaged"]:
-        group_data = pi_data[pi_data["Group"] == group]
-        fig.add_trace(
-            go.Bar(
-                x=group_data["theta"],
-                y=group_data["Rate"],
-                name=group,
-                legendgroup=group,
-                showlegend=(i == 0),  # Only show in legend for first row
-                marker_color="red" if group == "Disadvantaged" else "blue"
-            ),
-            row=i+1, col=1
-        )
+    # Run simulation
+    for pi in pi_values:
+        for theta in thetas:
+            # Calculate group rates
+            rate_disadv = incarceration_rate(avg_rate, 'disadvantaged', theta, pi)
+            rate_adv = incarceration_rate(avg_rate, 'advantaged', theta, pi)
+            
+            # Calculate population average
+            pop_avg = pi * rate_disadv + (1 - pi) * rate_adv
+            
+            # Calculate disparity measures
+            disparities = calculate_disparity_measures(rate_disadv, rate_adv)
+            
+            # Store results
+            for group, rate in [('Disadvantaged', rate_disadv), 
+                              ('Advantaged', rate_adv),
+                              ('Population Average', pop_avg)]:
+                data.append({
+                    "theta": theta,
+                    "Group": group,
+                    "Rate": rate,
+                    "pi": pi,
+                    "avg_rate": avg_rate,
+                    **disparities
+                })
     
-    # Add population average line
-    pop_avg_data = df[(df["Group"] == "Population Average") & (df["pi"] == pi)]
-    fig.add_trace(
-        go.Scatter(
-            x=pop_avg_data["theta"],
-            y=pop_avg_data["Rate"],
-            mode="lines",
-            line=dict(color="grey", width=1.5, dash="dash"),
-            name="Population Average",
-            legendgroup="Population Average",
-            showlegend=(i == 0)  # Only show in legend for first row
-        ),
-        row=i+1, col=1
-    )
+    # Convert results to DataFrame
+    return pd.DataFrame(data)
+
+def create_total_simulation_data(thetas, pi_values, avg_rates):
+    """
+    Create simulation data varying disparity parameter, group proportion, and average rate.
     
-    # Add disparity metrics table to right column
-    # Create summary table for each theta value
-    table_data = []
-    for theta in thetas:
-        theta_data = df[(df["pi"] == pi) & (df["theta"] == theta) & (df["Group"] == "Disadvantaged")]
-        if not theta_data.empty:
-            row = theta_data.iloc[0]
-            table_data.append([
-                f"{theta:.2f}",
-                f"{row['Disparity Difference']:.1f}",
-                f"{row['Disparity Ratio']:.2f}",
-                f"{row['Odds']:.5f}",
-                f"{row['Odds Ratio']:.2f}"
-            ])
+    Parameters:
+    -----------
+    thetas : list or array
+        Disparity parameter values
+    pi_values : list or array
+        Group proportion values
+    avg_rates : list or array
+        Average incarceration rate values per 100,000
+        
+    Returns:
+    --------
+    pd.DataFrame
+        DataFrame containing simulation results
+    """
+    # Store simulation results
+    data = []
     
-    fig.add_trace(
-        go.Table(
-            header=dict(
-                values=["θ", "Disparity Diff", "Disparity Ratio", "Odds (Disadv)", "Odds Ratio"],
-                font=dict(size=10),
-                align="left"
-            ),
-            cells=dict(
-                values=list(map(list, zip(*table_data))),
-                font=dict(size=10),
-                align="left"
-            )
-        ),
-        row=i+1, col=2
-    )
+    # Run simulation
+    for avg_rate in avg_rates:
+        for pi in pi_values:
+            for theta in thetas:
+                # Calculate group rates
+                rate_disadv = incarceration_rate(avg_rate, 'disadvantaged', theta, pi)
+                rate_adv = incarceration_rate(avg_rate, 'advantaged', theta, pi)
+                
+                # Calculate population average
+                pop_avg = pi * rate_disadv + (1 - pi) * rate_adv
+                
+                # Calculate disparity measures
+                disparities = calculate_disparity_measures(rate_disadv, rate_adv)
+                
+                # Store results
+                for group, rate in [('Disadvantaged', rate_disadv), 
+                                  ('Advantaged', rate_adv),
+                                  ('Population Average', pop_avg)]:
+                    data.append({
+                        "theta": theta,
+                        "Group": group,
+                        "Rate": rate,
+                        "pi": pi,
+                        "avg_rate": avg_rate,
+                        **disparities
+                    })
+    
+    # Convert results to DataFrame
+    return pd.DataFrame(data)
 
-# Update layout
-fig.update_layout(
-    height=300 * len(pi_values),
-    width=1000,
-    title="Group Effect on Incarceration Rates with Disparity Metrics",
-    barmode="group",
-    legend=dict(
-        orientation="h",
-        yanchor="bottom",
-        y=1.02,
-        xanchor="center",
-        x=0.5
-    )
-)
-
-# Update axes
-for i in range(len(pi_values)):
-    fig.update_xaxes(title_text="θ (Disparity Parameter)", row=i+1, col=1)
-    if i == len(pi_values) - 1:
-        fig.update_yaxes(title_text="Incarceration Rate", row=i+1, col=1)
-    else:
-        fig.update_yaxes(title_text="", row=i+1, col=1)
-
-fig.show()
+if __name__ == "__main__":
+    """
+    Run simulations exploring how group size and disparity parameters affect
+    measured inequality in incarceration rates.
+    """
+    # Simulation parameters
+    thetas = np.linspace(0, 1, 5)  # Disparity parameter values
+    pi_values = np.linspace(.1, .9, 3)  # Group proportion values
+    avg_rate = 200  # Average incarceration rate per 100,000 for explanatory simulation
+    avg_rates = [100, 200, 500, 1000]  # Average rates for total simulation
+    
+    # Run explanatory simulation (fixed average rate)
+    print("Running explanatory simulation...")
+    explanatory_df = create_explanatory_simulation_data(thetas, pi_values, avg_rate)
+    
+    # Save explanatory simulation data
+    save_simulation_data(explanatory_df, "explanatory_simulation_data.csv")
+    
+    # Create and save explanatory simulation plot
+    explanatory_fig = plot_explanatory_simulation(explanatory_df, pi_values, thetas)
+    save_figure(explanatory_fig, "explanatory_direct_effect_simulation")
+    
+    # Run total simulation (varying average rate)
+    print("Running total simulation...")
+    total_df = create_total_simulation_data(thetas, pi_values, avg_rates)
+    
+    # Save total simulation data
+    save_simulation_data(total_df, "total_simulation_data.csv")
+    
+    # Note: Total simulation plotting will be implemented later
+    # plot_total_simulation(total_df, pi_values, thetas, avg_rates)
