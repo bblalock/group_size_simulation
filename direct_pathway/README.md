@@ -46,7 +46,8 @@ The simulation systematically varies $\pi$ and $\theta$ to explore how group siz
    - For advantaged group: $\text{GroupRate}_{adv} = \text{avgRate} \cdot (1-\theta)$
 
 4. Calculate disparity measures:
-    - DisparityRatio = $\frac{\text{GroupRate}_{disadv}}{\text{GroupRate}_{adv}} = \frac{1 + \theta \cdot \frac{1-\pi}{\pi}}{1-\theta}$
+   - Rate-based measures:
+    - DisparityRatio = $\frac{\text{GroupRate}_{\text{disadv}}}{\text{GroupRate}_{\text{adv}}} = \frac{1 + \theta \cdot \frac{1-\pi}{\pi}}{1-\theta}$
     - DisparityDifference = $\text{GroupRate}_{disadv} - \text{GroupRate}_{adv} = \text{avgRate} \cdot \left(\theta \cdot \frac{1-\pi}{\pi} + \theta\right)$
    
    - Odds-based measures (converting rates to probabilities if necessary):
