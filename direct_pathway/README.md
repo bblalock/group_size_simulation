@@ -46,29 +46,30 @@ The simulation systematically varies $\pi$ and $\theta$ to explore how group siz
    - For advantaged group: $\text{GroupRate}_{adv} = \text{avgRate} \cdot (1-\theta)$
 
 4. Calculate disparity measures:
-   - Rate-based measures:
    
-   DisparityRatio = 
+#### Rate-based measures:
 
-   $$\frac{\text{GroupRate}_{\text{disadv}}}{\text{GroupRate}_{\text{adv}}} = \frac{1 + \theta \cdot \frac{1-\pi}{\pi}}{1-\theta}$$
+DisparityRatio = 
 
-   DisparityDifference = 
+$$\frac{\text{GroupRate}_{\text{disadv}}}{\text{GroupRate}_{\text{adv}}} = \frac{1 + \theta \cdot \frac{1-\pi}{\pi}}{1-\theta}$$
 
-   $$\text{GroupRate}_{disadv} - \text{GroupRate}_{adv} = \text{avgRate} \cdot \left(\theta \cdot \frac{1-\pi}{\pi} + \theta\right)$$
-   
-   - Odds-based measures (converting rates to probabilities if necessary):
-   
-   Odds for disadvantaged group:
+DisparityDifference = 
 
-   $$\text{Odds}_{disadv} = \frac{\text{GroupRate}_{disadv}}{1 - \text{GroupRate}_{disadv}}$$
+$$\text{GroupRate}_{disadv} - \text{GroupRate}_{adv} = \text{avgRate} \cdot \left(\theta \cdot \frac{1-\pi}{\pi} + \theta\right)$$
 
-   Odds for advantaged group:
+- Odds-based measures (converting rates to probabilities if necessary):
 
-   $$\text{Odds}_{adv} = \frac{\text{GroupRate}_{adv}}{1 - \text{GroupRate}_{adv}}$$
+Odds for disadvantaged group:
 
-   OddsRatio = 
+$$\text{Odds}_{disadv} = \frac{\text{GroupRate}_{disadv}}{1 - \text{GroupRate}_{disadv}}$$
 
-   $$\frac{\text{Odds}_{disadv}}{\text{Odds}_{adv}}$$
+Odds for advantaged group:
+
+$$\text{Odds}_{adv} = \frac{\text{GroupRate}_{adv}}{1 - \text{GroupRate}_{adv}}$$
+
+OddsRatio = 
+
+$$\frac{\text{Odds}_{disadv}}{\text{Odds}_{adv}}$$
 
 5. Analyze how disparity measures vary with:
    - Group size proportions ($\pi$)
