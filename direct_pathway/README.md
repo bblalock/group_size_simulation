@@ -1,6 +1,6 @@
 # Direct Pathway Simulation
 
-This simulation explores the direct causal pathway where race directly affects incarceration risk, independent of economic position. In this model, group membership has a direct effect on expected incarceration rate.
+This simulation explores the direct causal pathway where race directly affects incarceration rate, independent of economic position. In this model, group membership has a direct effect on expected incarceration rate.
 
 ## Model Specification
 
