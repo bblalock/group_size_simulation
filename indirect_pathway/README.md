@@ -1,6 +1,6 @@
 # Indirect Pathway Simulation
 
-This simulation explores the indirect causal pathway where race affects incarceration risk through economic position. In this model, group membership influences economic position, which in turn determines incarceration risk.
+This simulation explores the indirect causal pathway where race affects incarceration rate through economic position. In this model, group membership influences economic position, which in turn determines incarceration rate.
 
 ## Model Specification
 
@@ -14,7 +14,7 @@ $$\text{PositionEffect}(p, \gamma) = \left(1-\frac{p}{100}\right)^{\gamma}$$
 
 
 - $p \in P = \{p \in \mathbb{R} \mid 0 \leq p \leq 100\}$ represents the economic percentile
-- $\gamma \in \mathbb{R}^+$ controls the shape of the relationship between economic position and incarceration risk
+- $\gamma \in \mathbb{R}^+$ controls the shape of the relationship between economic position and incarceration rate
 
 This function has the following properties:
 - It equals 1 at the lowest economic position ($p = 0$) and approaches 0 at the highest position ($p = 100$)
