@@ -9,21 +9,15 @@ The direct pathway models use simplified approaches where incarceration rates ar
 ### Standard Model
 The Standard Model conceptualizes discrimination in punishment as a function of group membership while maintaining a constant population-wide incarceration rate. It introduces a parameter d that directly represents the disparity ratio between disadvantaged and advantaged groups (i.e., the disadvantaged group's incarceration rate is exactly d times that of the advantaged group). This approach ensures that the total "amount" of punishment in the system remains fixed, with changes in the disparity ratio d only affecting how that punishment is allocated across groups, not the overall incarceration level.
 
-$$\text{IncarcerationRate}(avgRate, g, d, p) = \frac{avgRate}{\text{GroupEffect}(g, d, p)}$$
+$$
+\text{IncarcerationRate}_{adv}(avgRate, d, p) = \frac{avgRate}{d \cdot p + (1-p)}
+$$
 
-Where:
+and 
 
-$$\text{GroupEffect}(g, d, p) = 
-\begin{cases} 
-d \cdot p + (1-p) & \text{if } g \in G_{\text{adv}} \\
-\frac{1}{d \cdot (d \cdot p + (1-p))} & \text{if } g \in G_{\text{disadv}}
-\end{cases}$$
-
-Which simplifies to:
-
-$$\text{Rate}\_{\text{adv}} = \frac{avgRate}{d \cdot p + (1-p)}$$
-
-$$\text{Rate}\_{\text{disadv}} = d \cdot \text{Rate}\_{\text{adv}}$$
+$$
+\text{IncarcerationRate}_{disadv}(avgRate, d, p) = d \cdot \text{Rate}\_{\text{adv}}
+$$
 
 Where:
 - $g \in G$ represents an individual's group membership
