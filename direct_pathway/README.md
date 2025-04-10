@@ -44,9 +44,11 @@ Factoring out common terms:
 $$\frac{avgRate}{D \cdot p + (1-p)} \cdot (p \cdot D + (1-p)) = avgRate$$
 
 This simplifies to:
+
 $$avgRate \cdot \frac{D \cdot p + (1-p)}{D \cdot p + (1-p)}$$
 
 Therefore:
+
 $$avgRate = avgRate$$
 
 Which confirms that the population-weighted average incarceration rate equals $avgRate$ for any value of $D$.
@@ -74,6 +76,7 @@ This function has the following properties:
 - When $B = 0$: Both groups have the same effect (1), equal to the population average
 - When $B = 1$: The advantaged group has an effect of 0, while the disadvantaged group has an effect of $1 + \frac{1-p}{p} = \frac{1}{p}$
 - For any value of $B$, the population-weighted average effect remains 1:
+
 $$p \cdot \left(1 + B \cdot \frac{1-p}{p}\right) + (1-p) \cdot (1-B) = 1$$
 
 This ensures that the population average remains constant at avgRate regardless of group size or discrimination level.
@@ -97,6 +100,7 @@ This function has the following properties:
 - When $D = 1$: Both groups have the same rate, equal to $baseRate$ (no discrimination)
 - When $D > 1$: The disadvantaged group's rate is exactly $D$ times that of the advantaged group
 - The population average incarceration rate varies with group size:
+
 $$\text{PopulationAverage} = baseRate \cdot (1 + p \cdot (D-1))$$
 
 ## Simulation Approach
