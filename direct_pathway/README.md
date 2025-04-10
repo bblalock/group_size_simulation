@@ -21,9 +21,9 @@ d \cdot p + (1-p) & \text{if } g \in G_{\text{adv}} \\
 
 Which simplifies to:
 
-$$\text{Rate}_{\text{adv}} = \frac{avgRate}{d \cdot p + (1-p)}$$
+$$\text{Rate}\_{\text{adv}} = \frac{avgRate}{d \cdot p + (1-p)}$$
 
-$$\text{Rate}_{\text{disadv}} = d \cdot \text{Rate}_{\text{adv}}$$
+$$\text{Rate}\_{\text{disadv}} = d \cdot \text{Rate}\_{\text{adv}}$$
 
 Where:
 - $g \in G$ represents an individual's group membership
@@ -33,7 +33,7 @@ Where:
 
 This model maintains a constant population average incarceration rate for any value of $d$, as demonstrated by:
 
-$$p \cdot \text{Rate}_{\text{disadv}} + (1-p) \cdot \text{Rate}_{\text{adv}} = avgRate$$
+$$p \cdot \text{Rate}\_{\text{disadv}} + (1-p) \cdot \text{Rate}\_{\text{adv}} = avgRate$$
 
 When we substitute the rate equations:
 
