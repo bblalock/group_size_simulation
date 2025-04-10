@@ -108,7 +108,7 @@ $$\text{PopulationAverage} = baseRate \cdot (1 + p \cdot (D-1))$$
 The simulations systematically vary multiple parameters to understand how group size affects measured inequality across all three models:
 
 1. **Parameter Selection**:
-   * Set population proportions: p ∈ [0.01, 0.99], number of values = $n_p$
+   * Set population proportions: p ∈ [0, 1], number of values = $n_p$
    * Choose average/base incarceration rates: range from 100 to 1000 per 100,000, number of values = $n_r$
    * Define disparity parameters for Standard Model and Non-Redistributive Disparity Model: D > 1, number of values = $n_d$
    * Define bias parameters for Bias-Controlled Redistribution Model: B ∈ [0, 1], number of values = $n_b$
@@ -130,7 +130,7 @@ The simulations systematically vary multiple parameters to understand how group 
 4. **Regression Analysis**:
    * Analyze how group size ($p$) affects disparity measures under different model assumptions by using multiple linear regression to __decompose__ variation across simulation runs
    * Quantify the proportion of variance in disparity measures explained by group size ($p$)
-        * Calculate $\Delta R^2 = R^2_{\text{full}} - R^2_{\text{reduced}}$ between runs with and without $p$ as a regressor to quantify variance uniquely explained by group size
+        * Calculate $\Delta R^2 = R^2_{\text{full}} - R^2_{\text{reduced}}$ between regression models with and without $p$ as a regressor to quantify variance uniquely explained by group size
    * Test for interaction effects to understand when group size has the largest impact
    * Compare results across all three models to identify robust patterns
 
