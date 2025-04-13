@@ -64,7 +64,7 @@ $$
 
 To derive the relationship between disparity ratio $d$ and bias parameter $b$, we can start with the definition of disparity ratio:
 
-$$d = \frac{\text{Rate}\_{\text{disadv}}}{\text{Rate}\_{\text{adv}}}$$
+$$d = \frac{\text{IncarcerationRate}\_{\text{disadv}}}{\text{IncarcerationRate}\_{\text{adv}}}$$
 
 Substituting the rate formulas from the Bias-Controlled Redistribution Model:
 
