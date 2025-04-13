@@ -9,11 +9,11 @@ The direct pathway models use simplified approaches where incarceration rates ar
 The Disparity-Controlled Redistribution Model conceptualizes discrimination in punishment as a function of group membership while maintaining a constant population-wide incarceration rate. It introduces a parameter d that directly represents the disparity ratio between disadvantaged and advantaged groups (i.e., the disadvantaged group's incarceration rate is exactly d times that of the advantaged group). This approach ensures that the total "amount" of punishment in the system remains fixed, with changes in the disparity ratio d only affecting how that punishment is allocated across groups, not the overall incarceration level.
 
 $$
-\text{IncarcerationRate}\\_{adv}(avgRate, d, p) = \frac{avgRate}{d \cdot p + (1-p)}
+\text{IncarcerationRate}\_{adv}(avgRate, d, p) = \frac{avgRate}{d \cdot p + (1-p)}
 $$
 and
 $$
-\text{IncarcerationRate}\\_{disadv}(avgRate, d, p) = d \cdot \text{IncarcerationRate}\\_{adv}
+\text{IncarcerationRate}\_{disadv}(avgRate, d, p) = d \cdot \text{IncarcerationRate}\_{adv}
 $$
 
 Where:
@@ -25,7 +25,7 @@ $avgRate$ is the population average incarceration rate
 
 This model maintains a constant population average incarceration rate for any value of $d$, as demonstrated by:
 
-$$p \cdot \text{IncarcerationRate}_{disadv} + (1-p) \cdot \text{IncarcerationRate}_{adv} = avgRate$$
+$$p \cdot \text{IncarcerationRate}\_{disadv} + (1-p) \cdot \text{IncarcerationRate}\_{adv} = avgRate$$
 
 When we substitute the rate equations:
 
