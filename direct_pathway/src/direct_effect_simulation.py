@@ -1,140 +1,194 @@
 import numpy as np
 import pandas as pd
+from typing import Callable, Dict, List, Any
 
-from models.direct_effect import incarceration_rate
+from models.direct_effect import (
+    standard_model_incarceration_rate,
+)
+from visualization.plots import (
+    create_explanatory_visual,
+    plot_3d_simulation_results,
+    plot_prop_disadv_to_bias_by_ratio,
+    plot_disadv_deviation_from_avg,
+    plot_disadv_deviation_boxplot
+)
 from analysis.disparity_measures import calculate_disparity_measures
-from visualization.plots import plot_explanatory_simulation
 from utils.io import save_figure, save_simulation_data
 
-def create_explanatory_simulation_data(thetas, pi_values, avg_rate=200):
+def run_factorial_simulation(
+    rate_function: Callable,
+    param_grid: Dict[str, np.ndarray],
+    model_name: str
+) -> pd.DataFrame:
     """
-    Create simulation data for the explanatory simulation with fixed average rate.
+    Run a factorial simulation for any incarceration rate model.
     
     Parameters:
     -----------
-    thetas : list or array
-        Disparity parameter values
-    pi_values : list or array
-        Group proportion values
-    avg_rate : float, default=200
-        Fixed average incarceration rate per 100,000
+    rate_function : Callable
+        Function that calculates incarceration rate. Must accept 'group' as one parameter
+    param_grid : Dict[str, np.ndarray]
+        Dictionary mapping parameter names to arrays of values to test
+        Must include 'p' for population proportion
+    model_name : str
+        Name of the model being simulated
         
     Returns:
     --------
     pd.DataFrame
         DataFrame containing simulation results
     """
-    # Store simulation results
     data = []
     
-    # Run simulation
-    for pi in pi_values:
-        for theta in thetas:
-            # Calculate group rates
-            rate_disadv = incarceration_rate(avg_rate, 'disadvantaged', theta, pi)
-            rate_adv = incarceration_rate(avg_rate, 'advantaged', theta, pi)
-            
-            # Calculate population average
-            pop_avg = pi * rate_disadv + (1 - pi) * rate_adv
-            
-            # Calculate disparity measures
-            disparities = calculate_disparity_measures(rate_disadv, rate_adv)
-            
-            # Store results
-            for group, rate in [('Disadvantaged', rate_disadv), 
-                              ('Advantaged', rate_adv),
-                              ('Population Average', pop_avg)]:
-                data.append({
-                    "theta": theta,
-                    "Group": group,
-                    "Rate": rate,
-                    "pi": pi,
-                    "avg_rate": avg_rate,
-                    **disparities
-                })
+    # Create all parameter combinations
+    param_names = list(param_grid.keys())
+    param_values = list(param_grid.values())
+    param_combinations = np.meshgrid(*param_values, indexing='ij')
+    param_combinations = [x.flatten() for x in param_combinations]
     
-    # Convert results to DataFrame
+    # Run simulation for each parameter combination
+    for params in zip(*param_combinations):
+        # Create parameter dictionary for this combination
+        param_dict = dict(zip(param_names, params))
+        p = param_dict['p']  # Extract population proportion
+        
+        # Calculate rates for both groups
+        rate_disadv = rate_function(group='disadvantaged', **param_dict)
+        rate_adv = rate_function(group='advantaged', **param_dict)
+        
+        # Calculate population average
+        pop_avg = p * rate_disadv + (1 - p) * rate_adv
+        
+        # Calculate disparity measures
+        disparities = calculate_disparity_measures(rate_disadv=rate_disadv, rate_adv=rate_adv, p=p)
+        
+        # Store results for each group
+        result = {
+            'prop_disadv': p,
+            "pop_avg": int(round(pop_avg)),
+            "rate_adv": rate_adv,
+            "rate_disadv": rate_disadv,
+            # **param_dict, # all the parameters except for p can be calculated (and are for are simulation types)
+            **disparities
+        }
+        data.append(result)
+    
     return pd.DataFrame(data)
 
-def create_total_simulation_data(thetas, pi_values, avg_rates):
+def create_model_param_grid(model: str, 
+                          p_values: np.ndarray,
+                          rate_values: np.ndarray,
+                          d_values: np.ndarray = None,
+                          b_values: np.ndarray = None) -> Dict[str, np.ndarray]:
     """
-    Create simulation data varying disparity parameter, group proportion, and average rate.
+    Create parameter grid for specific model type.
     
     Parameters:
     -----------
-    thetas : list or array
-        Disparity parameter values
-    pi_values : list or array
-        Group proportion values
-    avg_rates : list or array
-        Average incarceration rate values per 100,000
-        
+    model : str
+        Model type ('standard', 'bias', or 'non_redistributive')
+    p_values : np.ndarray
+        Array of population proportion values
+    rate_values : np.ndarray
+        Array of rate values (avg_rate or base_rate)
+    d_values : np.ndarray, optional
+        Array of disparity ratio values
+    b_values : np.ndarray, optional
+        Array of bias parameter values
+    
     Returns:
     --------
-    pd.DataFrame
-        DataFrame containing simulation results
+    Dict[str, np.ndarray]
+        Parameter grid dictionary
     """
-    # Store simulation results
-    data = []
-    
-    # Run simulation
-    for avg_rate in avg_rates:
-        for pi in pi_values:
-            for theta in thetas:
-                # Calculate group rates
-                rate_disadv = incarceration_rate(avg_rate, 'disadvantaged', theta, pi)
-                rate_adv = incarceration_rate(avg_rate, 'advantaged', theta, pi)
-                
-                # Calculate population average
-                pop_avg = pi * rate_disadv + (1 - pi) * rate_adv
-                
-                # Calculate disparity measures
-                disparities = calculate_disparity_measures(rate_disadv, rate_adv)
-                
-                # Store results
-                for group, rate in [('Disadvantaged', rate_disadv), 
-                                  ('Advantaged', rate_adv),
-                                  ('Population Average', pop_avg)]:
-                    data.append({
-                        "theta": theta,
-                        "Group": group,
-                        "Rate": rate,
-                        "pi": pi,
-                        "avg_rate": avg_rate,
-                        **disparities
-                    })
-    
-    # Convert results to DataFrame
-    return pd.DataFrame(data)
+    if model == 'standard':
+        return {
+            'p': p_values,
+            'avg_rate': rate_values,
+            'd': d_values
+        }
+    elif model == 'bias':
+        return {
+            'p': p_values,
+            'avg_rate': rate_values,
+            'b': b_values
+        }
+    elif model == 'non_redistributive':
+        return {
+            'p': p_values,
+            'base_rate': rate_values,
+            'd': d_values
+        }
+    else:
+        raise ValueError(f"Unknown model type: {model}")
 
 if __name__ == "__main__":
     """
-    Run simulations exploring how group size and disparity parameters affect
-    measured inequality in incarceration rates.
+    Run factorial simulations for all three models exploring how group size 
+    and various disparity parameters affect measured inequality in incarceration rates.
     """
-    # Simulation parameters
-    thetas = np.linspace(0, 1, 5)  # Disparity parameter values
-    pi_values = np.linspace(.1, .9, 3)  # Group proportion values
-    avg_rate = 200  # Average incarceration rate per 100,000 for explanatory simulation
-    avg_rates = [100, 200, 500, 1000]  # Average rates for total simulation
+    # Define parameter ranges
+    p_values = np.round(np.arange(0.1, 1, 0.01), 2)  # Group proportion values from 0.1 to 1.0 with 100 values
+    d_values = np.linspace(1, 10, 30)   # Disparity ratio values with 100 values
+    avg_rate_values = np.linspace(50, 500, 100)  # Rate values per 100,000 with 100 values
+
+    n_results = len(p_values)*len(d_values)*len(avg_rate_values)
+    print(f'{n_results} simulations')
     
-    # Run explanatory simulation (fixed average rate)
-    print("Running explanatory simulation...")
-    explanatory_df = create_explanatory_simulation_data(thetas, pi_values, avg_rate)
+    # Define model configurations
+    model_configs = [
+        {
+            'name': 'Standard',
+            'function': standard_model_incarceration_rate,
+            'param_grid': create_model_param_grid(model='standard', p_values=p_values, rate_values=avg_rate_values, d_values=d_values)
+        },
+    ]
     
-    # Save explanatory simulation data
-    save_simulation_data(explanatory_df, "explanatory_simulation_data.csv")
-    
-    # Create and save explanatory simulation plot
-    explanatory_fig = plot_explanatory_simulation(explanatory_df, pi_values, thetas)
-    save_figure(explanatory_fig, "explanatory_direct_effect_simulation")
-    
-    # Run total simulation (varying average rate)
-    print("Running total simulation...")
-    total_df = create_total_simulation_data(thetas, pi_values, avg_rates)
-    
-    # Save total simulation data
-    save_simulation_data(total_df, "total_simulation_data.csv")
-    
-    # Note: Total simulation plotting will be implemented later
-    # plot_total_simulation(total_df, pi_values, thetas, avg_rates)
+    # Run simulations for all models
+    results = []
+    for config in model_configs:
+        print(f"Running {config['name']} Model simulation...")
+        df = run_factorial_simulation(
+            config['function'],
+            config['param_grid'],
+            config['name']
+        )
+        results.append(df)
+        
+        # Save individual model results
+        save_simulation_data(df, f"{config['name'].lower()}_simulation.csv")
+        
+        # Create and save visualizations
+        print(f"Creating visualizations for {config['name']} Model...")
+        
+        # 3D visualization of simulation results
+        print("Generating 3D simulation plot...")
+        fig_3d = plot_3d_simulation_results(df, width=900, height=700)
+        save_figure(fig_3d, f"{config['name'].lower()}_3d_simulation")
+        
+        # Plot proportion disadvantaged to bias by ratio
+        print("Generating proportion disadvantaged to bias plot...")
+        fig_prop = plot_prop_disadv_to_bias_by_ratio(df, width=700, height=700)
+        save_figure(fig_prop, f"{config['name'].lower()}_prop_disadv_to_bias")
+        
+        # Plot disadvantaged deviation from average
+        print("Generating disadvantaged deviation plot...")
+        fig_dev = plot_disadv_deviation_from_avg(df, width=700, height=700)
+        save_figure(fig_dev, f"{config['name'].lower()}_disadv_deviation")
+        
+        # Plot disadvantaged deviation boxplot
+        print("Generating disadvantaged deviation boxplot...")
+        fig_box = plot_disadv_deviation_boxplot(df, width=900, height=700)
+        save_figure(fig_box, f"{config['name'].lower()}_disadv_deviation_boxplot")
+        
+        # Create explanatory visual
+        print("Generating explanatory visual...")
+        fig_exp = create_explanatory_visual(df, width=700, height=700)
+        save_figure(fig_exp, f"{config['name'].lower()}_explanatory_visual")
+        
+        # Create explanatory visual
+        print("Generating relative explanatory visual...")
+        fig_exp = create_explanatory_visual(df, relative=True, width=700, height=700)
+        save_figure(fig_exp, f"{config['name'].lower()}_explanatory_visual_relative")
+        
+        

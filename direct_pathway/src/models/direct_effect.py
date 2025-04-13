@@ -1,42 +1,17 @@
-def group_effect(group: str, theta: float, pi: float) -> float:
+def standard_model_incarceration_rate(avg_rate: float, group: str, d: float, p: float, **kwargs) -> float:
     """
-    Calculate the group effect multiplier for incarceration rates.
-    
-    Parameters:
-    -----------
-    group : str
-        Either 'disadvantaged' or 'advantaged'
-    theta : float
-        Disparity parameter in [0,1] that controls discrimination strength
-        theta = 0: Both groups equal to population average
-        theta = 1: Advantaged group at 0, disadvantaged group at 1/pi
-    pi : float
-        Proportion of population in disadvantaged group
-        
-    Returns:
-    --------
-    float
-        Multiplier for the group's incarceration rate
-    """
-    is_disadvantaged = group.lower() == 'disadvantaged'
-    if is_disadvantaged:
-        return 1 + theta * ((1 - pi) / pi)  # When theta=1, equals 1/pi
-    else:
-        return 1 - theta  # When theta=1, equals 0
-
-def incarceration_rate(avg_rate: float, group: str, theta: float, pi: float) -> float:
-    """
-    Calculate the incarceration rate for a given group.
+    Calculate incarceration rates using the Standard Model.
+    Maintains constant population-wide incarceration rate with disparity ratio d.
     
     Parameters:
     -----------
     avg_rate : float
-        Base/average incarceration rate for the population
+        Population average incarceration rate
     group : str
         Either 'disadvantaged' or 'advantaged'
-    theta : float
-        Disparity parameter controlling discrimination strength
-    pi : float
+    d : float
+        Disparity ratio between groups (d >= 1)
+    p : float
         Proportion of population in disadvantaged group
         
     Returns:
@@ -44,4 +19,62 @@ def incarceration_rate(avg_rate: float, group: str, theta: float, pi: float) -> 
     float
         Expected incarceration rate for the group
     """
-    return avg_rate * group_effect(group, theta, pi)
+    advantaged_rate = avg_rate / (d * p + (1 - p))
+    is_disadvantaged = group.lower() == 'disadvantaged'
+    if is_disadvantaged:
+        return d * advantaged_rate
+    else:
+        return advantaged_rate
+
+def bias_controlled_redistribution_rate(avg_rate: float, group: str, b: float, p: float, **kwargs) -> float:
+    """
+    Calculate incarceration rates using the Bias-Controlled Redistribution Model.
+    Uses bias parameter b to redistribute punishment while maintaining constant total.
+    
+    Parameters:
+    -----------
+    avg_rate : float
+        Population average incarceration rate
+    group : str
+        Either 'disadvantaged' or 'advantaged'
+    b : float
+        Bias parameter in [0,1] controlling punishment redistribution
+    p : float
+        Proportion of population in disadvantaged group
+        
+    Returns:
+    --------
+    float
+        Expected incarceration rate for the group
+    """
+    is_disadvantaged = group.lower() == 'disadvantaged'
+    if is_disadvantaged:
+        return avg_rate * (1 + b * ((1 - p) / p))
+    else:
+        return avg_rate * (1 - b)
+
+
+def non_redistributive_disparity_rate(base_rate: float, group: str, d: float, **kwargs) -> float:
+    """
+    Calculate incarceration rates using the Non-Redistributive Disparity Model.
+    Adds punishment rather than redistributing it.
+    
+    Parameters:
+    -----------
+    base_rate : float
+        Baseline incarceration rate for advantaged group
+    group : str
+        Either 'disadvantaged' or 'advantaged'
+    d : float
+        Disparity ratio between groups (d >= 1)
+        
+    Returns:
+    --------
+    float
+        Expected incarceration rate for the group
+    """
+    is_disadvantaged = group.lower() == 'disadvantaged'
+    if is_disadvantaged:
+        return d * base_rate
+    else:
+        return base_rate
