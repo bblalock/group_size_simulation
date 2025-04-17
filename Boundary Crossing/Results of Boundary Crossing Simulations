@@ -1,0 +1,241 @@
+Scenario One: Wide Range of Movers’ Incarceration Rates 
+
+Scenario One allows b2w and w2b movers’ incarceration rates to vary from 50-1000, randomly, where white remainers’ rate is 100 and black remainers’ rate is 500. 
+
+Firstly, we might ask how the number of remainers affects the observed disparity in incarceration rates. I begin with looking at the incarceration rates, post-movement (movers’ are counted in the destination category). 
+
+Figure 1
+![Post-Movement Black-White Incarceration Stability](Disparity_by_Movers1.gph)
+ 
+
+	There are several important takeaways from this graph. Firstly, as we should expect, where there are very few movers, there is almost no variation in disparities. Not only do the rates average five, but they cluster around it. Secondly, as movers’ make up an increasing share of the population, the range of observed disparities increases significantly. We can see that there are simulations where the observed disparity was 2:1, and simulations where it was 7:1. Thirdly, we can see that on average, observed disparities decrease as the number of movers increase. The slope, which is non-linear, is not particularly steep; even when half the black population at t=2 had been in the white category at t =1, the average level of inequality is still 4:1. 
+
+Figure 2
+ 
+
+	Next, we ask what pre-movement disparities look like, in this scenario. The answer; on average, they look like post-movement disparities. But, for any given scenario, the presence of movers makes the post- and pre-movement disparities not equal each other. Observe what happens when we graph the change in disparities, in each simulation 
+
+Figure 3
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	Within particular simulations, pre- and post-movement disparities differ significantly. But across simulations, there is no difference; the average change is 0, at any level of mover frequency. 
+
+How does the incarceration rate of Black to White Movers affect the disparity rate? 
+
+Figure 4
+
+ 
+
+	As the black-to-white movers’ incarceration rate increases, observed disparities decrease. This is as we should expect; at high incarceration rate levels, they are increasing the white incarceration rate, thus bringing down disparities. Interestingly, this relationship does not appear to be linear; beyond a certain level (about .6), the highest possible disparity remains set at 5:1. 
+
+Figure 5
+
+ 
+	A similar relationship is found, looking at white-to-black movers’ incarceration rate. As their incarceration rate increases, inequality increases, as we would expect. 
+
+Figure 6 							Figure 7
+
+ 
+	We can see that, even though the number of movers did not (on net) affect the change in disparity, the incarceration rate of movers does. For instance, when b2w movers have a high incarceration rate, disparities are lower, post-movement, relative to pre-movement, as we would expect given that these b2w movers increase the white rate, post-movement, and the black rate, pre-movement. 
+
+Figure 8 
+
+ 
+	I conducted a regression, predicting the post-movement incarceration rate. Observe the R-squared value of .9811. The number of movers brings down disparities, independent of other variables. While the incarceration rate of b2ws and w2bs have independent effects, their impact is greatly magnified by the number of movers. This is predictable, since where there are very few movers, the effect of their incarceration rate should be very small. 
+
+	Next, I preview scenarios three and four. What happens when movers are like the destination, or origin category? 
+
+Figure 9 						Figure 10 
+
+Post-movement Disparity				Pre-movement Disparity
+
+	When movers are like their destination category, post-movement disparity rates converge to 5:1. Similarly, when movers are like their origin category, pre-movement disparities converge to 5:1. However, when movers are like their destination category, pre-movement disparity rates appear much lower, at 3.5:1, and when movers are like their origin category, it is the post-movement disparity rates that are much lower, at 3.2:1. 
+
+	In general, I am loathe to consider any particular classification “correct.” But, we may want to consider these types of scenarios as potential misclassifications. That is, the movers are acting like group a, but they are classified in group b, and observed disparities are subsequently lower than if they “properly” classified. 
+
+Figure 11
+
+ 
+
+
+	These effects are magnified when mobility is higher. When individuals are “properly” classified, the number of movers doesn’t matter, since they aren’t affecting the incarceration disparity of 5:1. But in the misclassification scenarios, the number of movers matters a lot; when there is high mobility, we observe a disparity of 2.7 or 2.8, whereas, with the alternate classification, the disparity would be 5:1. 
+
+Scenario Two: Narrow Range of Movers’ Incarceration Rates (Between White and Black Remainers)
+
+	In Scenario Two, we restrict movers’ incarceration rates to be between 100-500: that is, between the black and white rates. Much of the analysis will remain identical, but there are some meaningful differences. 
+
+
+
+
+
+Figure 12
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+	Consider Figure 12, compared to Figure 1. The slope of the curve is significantly steeper. And, there are no values above 5. This is because, with a maximal w2b rate of 500, and a minimal b2w rate of 100, there is no mathematical way for the presence of movers to increase disparities. The effect can either be 0, to lower inequality. You will observe that not only is the upper tail of the distribution truncated, but so is the lower tail, as well. There are no values at 2:1, unlike in Figure 1. 
+
+Figure 13 
+
+	
+
+	
+
+
+
+
+
+
+
+
+
+
+
+	The reduction in variation can also be seen in Figure 13, which looks at the change in disparities. Whereas Figure 3 indicated that the change maxed out at roughly 5, in this scenario, they max out at roughly 2. 
+
+
+
+How does the incarceration rate of movers’ affect observed disparities? It appears that truncating the range of movers’ incarceration rates reduces the overall strength of the relationship. 
+
+Figure 14 						 Figure 15
+
+
+	Why is the w2b slope steeper than the b2w slope? Because the w2b population makes up a much larger share of the black population, post-movement – as much as 50%– than the b2w population makes of the white population – no more than 9%. 
+
+Figure 16
+
+
+ 
+	Regression results are very similar to the previous scenario, though the movers’ coefficient is more negative. 
+
+Scenario Three: Movers’ Incarceration Rates Similar to Destination Category 
+
+In Scenario Three, I restrict movers’ incarceration rates to be within 25% of the destination category. Doing this makes the post-movement disparity average 5, and greatly reduces the range of observed disparities. 
+
+Figure 17
+
+
+
+
+	As we can see, when restricted in this way, the number of movers has no effect, on net, on the post-movement disparity. However, as the number of movers increases, the variance does increase, though not by very much. 
+
+Figure 18
+
+ 
+
+
+	By contrast, if we look at pre-movement disparities, the number of movers has a strong negative effect. This is because of what is essentially noise, created by the people who are incarcerated like white people, being included in the black population, and people who are incarcerated like black people, being included in the white population. 
+
+Figure 19 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	Correspondingly, the more movers there are, the greater the change in disparity, from pre- to post-movement. 
+
+Figure 20 
+
+ 
+
+	The regression analysis indicates the importance of the number of movers, along with its interactions with the rates of the movers. 
+
+Figure 21 						Figure 22 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	Interestingly, the limited range of movers’ incarceration rates means that the direct effect of those rates is pretty weak. But, this varies between the b2w and w2b movers. I was a bit surprised these graphs look so different; is this because of the greater importance of the w2b rate? And the fact that the actual range of the w2b’s incarceration rates is so much greater? 
+
+
+
+Figure 22 
+
+
+	Conversely, when looking at the pre-movement disparities, the w2b and b2w graphs look the same, though the effect of the w2b graph is stronger. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Scenario Four: Movers’ Incarceration Rates Similar to Origin Category
+
+In Scenario Four, I restrict movers’ incarceration rates to be similar to the origin category. However, this scenario is literally just the opposite of scenario three. That is, the shape of Figure 18 would reflect post-movement disparities, rather than pre-movement disparities. Figure 19 would have the same shape, but downwardly sloping. And so forth. So I do not graph those here. 
+
+Takeaways
+
+The consequences of boundary crossing depends heavily on the number of boundary crossers and the assumptions we make about their incarceration rates. Where we can measure boundary crossers’ incarceration rate, their presence is not problematic; we just have to decide how to classify them, turning it into an aggregation problem. Typically, however, we do not have data on the incarceration of boundary crossers, specifically. 
+
+One challenge in thinking about how sizeable these effects are is that in different domains, we might have different expectations about the precision of estimates of inequality. In comparing racial disparities in imprisonment across countries, a change in the disparity ratio from 5.0 to 4.5 is not particularly meaningful. But in the context of the United States, where we expect to have more precision, that would be a 12.5% reduction, and would be worth adjusting for if possible. I will make my comments with the international comparisons in mind. 
+
+Where the number of boundary crossers is small, the effects are pretty muted. Consider that in even the most aggressive scenario (scenario 3), if boundary crossers are 10% of the population, the observed disparity ratio is roughly 4.2, compared to 5.0. And in scenarios where we allow more variation in crossers’ incarceration rates, the observed disparity ratio is closer to 4.5, though with a greater range. 
+
+	However, the effects get quite large as the number of boundary-crossers increase. At the extreme end (which is observed in some cases, historically), at 50% of the smaller population moving into/out of the group, the average disparity observed reduces significantly, and there is too much variation to confidently adjust the observed disparity (at least, if we don’t know what the incarceration rate of the movers’ looks like). 
+
+	I would argue that we care about both the pre- and post-movement disparity, at least in the abstract. And insofar as we cannot observe boundary crossers, or their incarceration rate, the presence of boundary crossers’ does not allow us to make this distinction, and thus preventing us from truly understanding the relationship between race and incarceration. 
