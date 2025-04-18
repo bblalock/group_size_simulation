@@ -1,0 +1,49 @@
+This folder contains information on simulations relating to Boundary Crossing, and how boundary crossing affects observed disparities between categories. 
+ 
+Boundary crossing is the movement of individuals between categories a and b, over time. That is, individual 1 might be within category a at t=1, and within category b at t=2. Historically, "passing" is one such example of boundary crossing, though there are many examples across societies, in different domains of social life. 
+
+The purpose of these simulations is to model how boundary crossing could affect racial disparities in incarceration. 
+
+***Simulation Parameters: All Scenarios*** 
+
+I model a population which is 85% white, and 15% black, with 10,000 total individuals. 
+
+The incarceration rate of people who start and end in the black category is 500, and the incarceration rate of people who start and end in the white white category is 100. 
+
+Therefore, when there are no boundary crossers, the observed black:white incarceration ratio is 5:1. 
+
+I set the number of "b2w" (black to white) movers as equal to the number of "w2b" (white to black) movers. 
+
+I vary the number of b2w movers from 0-750. I choose 750 because having half the population of a group leave/enter between time periods is similar to the level of movement between the Mulatto and Black categories, historically [insert more detail]. 
+
+I then run 1,000 simulations, for each scenario. There are four scenarios, described below. 
+In each of the scenarios, we are interested in three outcomes of interest. 
+A.	How much disparity there is prior to movement between categories 
+B.	How much disparity there is, after movement between categories 
+C.	B-A 
+
+That is, we’re interested in how much inequality there is, with an implicit reference of 5:1 as the disparity we would observe in the absence of any movers. Quantity A need not equal 5:1, because even though the disparity ratio of remainers is 5:1, the inclusion of movers in the pre-movement comparison means that the pre-movement ratio will typically not be 5:1. Thus, we are interested in quantities A and B in relation to 5:1, as well as how these two quantities differ from each other (quantity C). 
+
+Future work could change any of these assumptions. For instance, the number of w2b movers might not equal the number of b2w movers. I am not looking specifically at group size, in this simulation, since that is the subject of another section, but we might analyze how boundary crossing and group size interact with each other. We could see what happens when the number of movers goes above 50% of the smaller group, though I think it is unlikely this would be observed empirically. And, we could explore if the changing the incarceration rates has any affect. 
+For all these simulations, I have the incarceration rate of each group of movers vary randomly, within the specified range. It is important to think through the implications of this. For instance, in the first scenario, more than half of all values (500/951) are greater than the incarceration rate of black remainers, while far fewer (50/951) are less than the incarceration rate of white remainers. That is, this supposedly random variation is actually having the affect of increasing both the black and white rates. I try to account for this with some of the later scenarios, but future work could consider non-random distributions.  
+For all the simulations, I calculate disparities based on individuals’ expected incarceration risk, rather than incarceration as measured in a binary 0-1 outcome. This is to prevent noise with small numbers of prisoners. When calculated 
+
+***Simulation Parameters: Scenario One***
+
+In the first scenario, I vary the expected incarceration rate of movers to be from 50-1000. That is, movers have an incarceration rate of, at minimum, half the white rate, and at maximum, twice the black rate. This scenario presupposes little about the incarceration rate of the movers, instead bounding their rates loosely to the rates of the existing groups. 
+
+I allow the incarceration rate of w2b movers and b2w movers to differ from each other, as we would expect in the real world. 
+
+*** Simulation Parameters: Scenario Two*** 
+In the second scenario, I vary the incarceration rate of movers between 100-500. That is, the movers’ incarceration rates are no lower than the advantaged group, and no higher than the disadvantaged group. 
+I allow the incarceration rate of w2b movers and b2w movers to differ from each other, as we would expect in the real world. 
+
+*** Simulation Parameters: Scenario Three*** 
+In the third scenario, I set movers’ incarceration rate to be within 25% of their destination category’s incarceration rate. That is, b2w movers have an incarceration rate from 75-125, and w2b movers have an incarceration rate from 375-625. 
+I consider this the most empirically plausible scenario, if people’s destination category is the causally most significant aspect of their incarceration risk, which will likely be the case for ethnoracial disparities. 
+  
+*** Simulation Parameters: Scenario Four*** 
+In the fourth scenario, I set movers’ incarceration rate to be within 25% of their origin category’s incarceration rate. That is, b2w movers have an incarceration rate from 375 to 625, and w2b movers have an incarceration rate from 75-125. 
+This scenario is plausible if people’s origin category is the most significant aspect of their incarceration risk. 
+
+
