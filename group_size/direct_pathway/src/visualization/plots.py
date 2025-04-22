@@ -47,13 +47,12 @@ def calculate_deviation_metrics(data):
     df = data.copy()
 
     # Calculate absolute deviation
-    df['disadv_delta_from_avg'] = df['rate_disadv'] - df['pop_avg']
+    df['disadv_delta_from_avg'] = np.abs(df['rate_disadv'] - df['pop_avg'])
+    df['adv_delta_from_avg'] = np.abs(df['rate_adv'] - df['pop_avg'])
 
     # Calculate percentage deviation
-    df['disadv_delta_from_avg_percent'] = (
-        df['rate_disadv'] - df['pop_avg']) / df['pop_avg'] * 100
-    df['adv_delta_from_avg_percent'] = (
-        df['rate_adv'] - df['pop_avg']) / df['pop_avg'] * 100
+    df['disadv_delta_from_avg_percent'] = df['disadv_delta_from_avg'] / df['pop_avg'] * 100
+    df['adv_delta_from_avg_percent'] = df['adv_delta_from_avg'] / df['pop_avg'] * 100
 
     # Round the disparity ratio for grouping
     df['disparity_ratio_rounded'] = df['disparity_ratio'].apply(np.round)

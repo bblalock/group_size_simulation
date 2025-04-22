@@ -1,4 +1,4 @@
-def standard_model_incarceration_rate(avg_rate: float, group: str, d: float, p: float, **kwargs) -> float:
+def direct_pathway_model_incarceration_rate(avg_rate: float, group: str, d: float, p: float, **kwargs) -> float:
     """
     Calculate incarceration rates using the Standard Model.
     Maintains constant population-wide incarceration rate with disparity ratio d.
