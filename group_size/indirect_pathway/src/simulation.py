@@ -9,6 +9,7 @@ from model.indirect_effect import (
 
 from core.simulation import run_factorial_simulation
 from core.utils.io import save_figure, save_simulation_data
+from indirect_pathway.app.constants import APP_DATA_PATH
 import os
 
 INDIRECT_PATHWAY_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -28,27 +29,27 @@ if __name__ == "__main__":
     # Define parameter ranges
     
     ## Parameters affecting z (economic) position b/w groups
-    p_values = np.round(np.arange(0.01, 0.99, 0.05), 2)  # Group proportion values
+    p_values = np.linspace(0.001,.99,20)   # Group proportion values
     
     ### Distribution parameters for beta distributions
     #### Mean positions - disadvantaged group always lower than advantaged
-    mu_disadv_values = [.2] # np.arange(.1,.5, .1)
-    z_position_gap_values = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6] #np.linspace(0,.4, 50)
+    mu_disadv_values = [0.2] #np.linspace(.1,.5,5)
+    z_position_gap_values = np.arange(0, .9, .2)
     
     #### Concentration parameters controlling distribution spread
-    c_disadv_values =  [20] #np.arange(1,10,1)  # Concentration parameter for disadvantaged group
-    c_adv_values =  [20] #np.arange(1,10,1)  # Concentration parameter for advantaged group
+    c_disadv_values = [20] #np.arange(1,50,5)  # Concentration parameter for disadvantaged group
+    c_adv_values = [20] #np.arange(1,50,5)  # Concentration parameter for advantaged group
     
     ## Parameters affecting incarceration risk given z  
-    gamma_values = np.linspace(0,5,20) 
-    target_avg_rate_values = [500] #np.array([100,200,300, 400, 500])
-    max_rate_values = [500] #np.array([100,200,300, 400, 500])  # Maximum rate value per 100,000
-    
+    gamma_values = np.linspace(0.1,5,20) 
+    target_avg_rate_values = [500] # np.linspace(100,500,5)
+    # max_rate_values = [500] #np.array([100,200,300, 400, 500])  # Maximum rate value per 100,000
+    floor_rate_values = np.linspace(0,500, 20)
     
     # Sample size for simulation
     sample_size_values = np.array([10000])
     
-    n_results = (len(p_values) * len(gamma_values) * len(max_rate_values) * 
+    n_results = (len(p_values) * len(gamma_values) * len(floor_rate_values) * 
                 len(mu_disadv_values) * len(z_position_gap_values) * 
                 len(c_disadv_values) * len(c_adv_values) * 
                 len(sample_size_values)
@@ -85,7 +86,8 @@ if __name__ == "__main__":
                 'c_adv': c_adv_values,
                 'sample_size': sample_size_values,
                 'normalized': [True],
-                'target_avg_rate': target_avg_rate_values
+                'target_avg_rate': target_avg_rate_values,
+                'min_rate': floor_rate_values
             }
         },
     ]
@@ -102,6 +104,7 @@ if __name__ == "__main__":
         
         # Save individual model results
         save_simulation_data(df, f"{config['name'].lower()}_simulation.csv", output_dir=OUTPUT_DIR_DATA)
+        save_simulation_data(df, f"{config['name'].lower()}_simulation.csv", output_dir=APP_DATA_PATH)
         
         # Create and save visualizations
         print(f"Creating visualizations for {config['name']} Model...")

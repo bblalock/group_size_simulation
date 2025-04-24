@@ -3,8 +3,8 @@ def plotly_theme_decorator(func):
     Decorator that applies a consistent theme to plotly figures.
     """
     def wrapper(*args, **kwargs):
-        height = kwargs.pop('height', 800) if 'height' in kwargs else 800
-        width = kwargs.pop('width', 1000) if 'width' in kwargs else 1000
+        height = kwargs.pop('height', 800) if 'height' in kwargs else None
+        width = kwargs.pop('width', 1000) if 'width' in kwargs else None
 
         fig = func(*args, **kwargs)
         fig.update_layout(
@@ -31,7 +31,10 @@ def plotly_theme_decorator(func):
                 xanchor='center'
             ),
             height=height,
-            width=width
+            width=width,
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
+            margin=dict(l=0, r=0),
         )
         return fig
     return wrapper

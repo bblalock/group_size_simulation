@@ -214,7 +214,7 @@ def plot_3d_simulation_results(standard_sim_data,
                                x='prop_disadv',
                                y='disadv_delta_from_avg_percent',
                                z='disparity_ratio',
-                               color='bias_parameter',
+                               color='normalized_disparity_index',
                                **kwargs
                                ):
     """
@@ -331,7 +331,7 @@ def plot_prop_disadv_to_bias_by_ratio(data, height=800, width=1000, n_std=1):
 
     # Group by prop_disadv and disparity_ratio (rounded) to calculate mean and std for confidence bands
     grouped_data = data.groupby(['prop_disadv', 'disparity_ratio_rounded'])[
-        'bias_parameter'].agg(['mean', 'std']).reset_index()
+        'normalized_disparity_index'].agg(['mean', 'std']).reset_index()
 
     # Add upper and lower bounds for confidence bands
     grouped_data['upper'] = grouped_data['mean'] + n_std*grouped_data['std']

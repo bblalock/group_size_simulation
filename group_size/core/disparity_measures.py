@@ -24,7 +24,7 @@ def calculate_disparity_measures(rate_disadv: float, rate_adv: float, p: float) 
     disparity_ratio = rate_disadv / rate_adv if rate_adv > 0 else float('inf')
 
     # Calculate bias parameter
-    bias_parameter = (disparity_ratio - 1)/(disparity_ratio + (1-p)/p) if rate_adv > 0 else 1.0 # This condition does make sense, if rate_adv 0, b =1 
+    normalized_disparity_index = (disparity_ratio - 1)/(disparity_ratio + (1-p)/p) if rate_adv > 0 else 1.0 # This condition does make sense, if rate_adv 0, b =1 
     
     # # Odds-based measures (rates are per 100,000)
     odds_disadv = rate_disadv / (100000 - rate_disadv) if rate_disadv < 100000 else float('inf')
@@ -33,7 +33,7 @@ def calculate_disparity_measures(rate_disadv: float, rate_adv: float, p: float) 
     
     return {
         'rate_difference': rate_diff,
-        'bias_parameter': bias_parameter,
+        'normalized_disparity_index': normalized_disparity_index,
         'disparity_ratio': disparity_ratio,
         'odds_ratio': odds_ratio,
         # 'odds_disadvantaged': odds_disadv,
