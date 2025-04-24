@@ -10,6 +10,8 @@ import os
 
 from direct_pathway.src.visualization.plots import calculate_deviation_metrics
 
+port = int(os.environ.get("PORT", PORT))
+
 # Load simulation results from the same path that would be used by save_simulation_data
 simulation_results = pd.read_csv(os.path.join(APP_DATA_PATH,'normalized_indirect_simulation.csv'))
 simulation_results = calculate_deviation_metrics(simulation_results)
@@ -27,4 +29,4 @@ register_callbacks(app, simulation_results=simulation_results)
 
 # Run the app
 if __name__ == '__main__':
-    app.run(debug=True, port=PORT)
+    app.run(debug=True, port=port)
