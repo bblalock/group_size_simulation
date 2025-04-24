@@ -29,4 +29,4 @@ register_callbacks(app, simulation_results=simulation_results)
 
 # Run the app
 if __name__ == '__main__':
-    app.run(debug=True, port=port)
+    app.run(debug=True, port=port, host='0.0.0.0')
