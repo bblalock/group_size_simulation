@@ -48,7 +48,7 @@ venv.bak/
 *.parquet
 *.feather
 # Uncomment if you want to include data files in your repo
-!group_size/indirect_pathway/app/output/data/*.csv
+!group_size/indirect_pathway/output/data/*.csv
 # !data/*.xlsx
 
 # Figures and outputs
