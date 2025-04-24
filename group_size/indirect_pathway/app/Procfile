@@ -1,1 +1,1 @@
-web: python app.py
+web: PYTHONPATH=$PYTHONPATH:$(pwd) && cd indirect_pathway/app python app.py
