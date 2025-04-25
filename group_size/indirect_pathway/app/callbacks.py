@@ -27,9 +27,10 @@ def register_callbacks(app, simulation_results):
          Input('c-adv-slider', 'value'),
          Input('gamma-slider', 'value'),
          Input('target-rate-slider', 'value'),
-         Input('floor-rate-slider', 'value')]
+         Input('floor-rate-slider', 'value'),
+         Input('population-average-rate-slider', 'value')]
     )
-    def update_graph(sample_size, p, mu_disadv, z_position_gap, c_disadv, c_adv, gamma, target_avg_rate, floor_rate):
+    def update_graph(sample_size, p, mu_disadv, z_position_gap, c_disadv, c_adv, gamma, target_avg_rate, floor_rate, population_avg_rate):
         # Generate positions
         positions = generate_stratification_positions(
             p=p,
@@ -44,7 +45,7 @@ def register_callbacks(app, simulation_results):
         rate_data = calculate_incarceration_rates_normalized(
             positions=positions,
             gamma=gamma,
-            target_avg_rate=target_avg_rate,
+            target_avg_rate=population_avg_rate,
             floor_rate=floor_rate
         )
         
@@ -66,7 +67,7 @@ def register_callbacks(app, simulation_results):
                 'factors': calculate_incarceration_rates_normalized(
                     positions=positions_for_factors,
                     gamma=max(gamma-1, 0),
-                    target_avg_rate=target_avg_rate,
+                    target_avg_rate=population_avg_rate,
                     floor_rate=floor_rate,
                     return_only_factors=True
                 )
@@ -76,7 +77,7 @@ def register_callbacks(app, simulation_results):
                 'factors': calculate_incarceration_rates_normalized(
                     positions=positions_for_factors,
                     gamma=gamma+1,
-                    target_avg_rate=target_avg_rate,
+                    target_avg_rate=population_avg_rate,
                     floor_rate=floor_rate,
                     return_only_factors=True
                 )
@@ -87,7 +88,7 @@ def register_callbacks(app, simulation_results):
         incarceration_fig = create_incarceration_rate_plot(
             rate_data=rate_data,
             gamma=gamma,
-            target_avg_rate=target_avg_rate,
+            target_avg_rate=population_avg_rate,
             positions=positions,
             norm_factors=norm_factors['gamma']['factors'],
             height=PLOT_HEIGHT 
@@ -100,7 +101,7 @@ def register_callbacks(app, simulation_results):
 
         position_to_rate_fig = create_position_to_rate_plot(
             gamma=gamma,
-            target_avg_rate=target_avg_rate,
+            target_avg_rate=population_avg_rate,
             floor_rate=floor_rate,
             norm_factors=norm_factors,
             height=PLOT_HEIGHT

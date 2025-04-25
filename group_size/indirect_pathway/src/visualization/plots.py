@@ -681,7 +681,13 @@ def create_simulation_3d_plot(simulation_results, z_col='disparity_ratio', min_r
         scene=dict(
             xaxis=dict(title="Proportion of Disadvantaged Group"),
             yaxis=dict(title="Stratification Parameter (γ)"),
-        )
+        ),
+        scene_camera=dict(
+            up=dict(x=0, y=0, z=1),       # The 'up' direction
+            center=dict(x=-0, y=0, z=0),   # The center point of the view
+            eye=dict(x=-1.48, y=-1.70, z=0.8)  # Camera position
+        ),
+        margin=dict(l=0, r=0, b=0, t=40),
     )
     
     # Add specific z-axis label if it's disparity ratio

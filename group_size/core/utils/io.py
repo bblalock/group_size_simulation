@@ -1,6 +1,6 @@
 import os
 
-def save_figure(fig, filename_base: str, output_dir: str):
+def save_figure(fig, filename_base: str, output_dir: str, html=False):
     """
     Save a plotly figure as HTML and PNG.
     
@@ -14,11 +14,11 @@ def save_figure(fig, filename_base: str, output_dir: str):
         Directory to save the figure
     """
     os.makedirs(output_dir, exist_ok=True)
-    
-    # Save as HTML
-    html_path = os.path.join(output_dir, f"{filename_base}.html")
-    fig.write_html(html_path)
-    print(f"Figure saved as HTML: {html_path}")
+    if html:
+        # Save as HTML
+        html_path = os.path.join(output_dir, f"{filename_base}.html")
+        fig.write_html(html_path)
+        print(f"Figure saved as HTML: {html_path}")
     
     # Save as PNG
     png_path = os.path.join(output_dir, f"{filename_base}.png")
