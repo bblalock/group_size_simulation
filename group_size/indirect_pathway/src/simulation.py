@@ -119,6 +119,7 @@ if __name__ == "__main__":
                 simulation_results=unconstrained_df,
                 min_rate=0
             )
+            fig_corr_unconstrained.update_layout(plot_bgcolor='white', paper_bgcolor='white')
             save_figure(fig_corr_unconstrained, f"{config['name'].lower()}_correlation_heatmap_unconstrained", 
                         output_dir=OUTPUT_DIR_FIGURES)
             
@@ -128,6 +129,7 @@ if __name__ == "__main__":
                 simulation_results=unconstrained_df,
                 min_rate_value=0
             )
+            fig_prob_unconstrained.update_layout(plot_bgcolor='white', paper_bgcolor='white')
             save_figure(fig_prob_unconstrained, f"{config['name'].lower()}_disparity_probability_unconstrained", 
                         output_dir=OUTPUT_DIR_FIGURES)
             
@@ -140,6 +142,7 @@ if __name__ == "__main__":
                 color_col='z_position_gap', 
                 width=900, height=700
             )
+            fig_3d_unconstrained.update_layout(plot_bgcolor='white', paper_bgcolor='white')
             save_figure(fig_3d_unconstrained, f"{config['name'].lower()}_3d_parameter_space_unconstrained", 
                         output_dir=OUTPUT_DIR_FIGURES)
         
@@ -154,6 +157,7 @@ if __name__ == "__main__":
                 simulation_results=constrained_df,
                 min_rate_value=constrained_floor_rate
             )
+            fig_prob_constrained.update_layout(plot_bgcolor='white', paper_bgcolor='white')
             save_figure(fig_prob_constrained, f"{config['name'].lower()}_disparity_probability_constrained", 
                         output_dir=OUTPUT_DIR_FIGURES)
             
@@ -163,6 +167,7 @@ if __name__ == "__main__":
                 simulation_results=constrained_df,
                 min_rate=constrained_floor_rate
             )
+            fig_corr_constrained.update_layout(plot_bgcolor='white', paper_bgcolor='white')
             save_figure(fig_corr_constrained, f"{config['name'].lower()}_correlation_heatmap_constrained", 
                         output_dir=OUTPUT_DIR_FIGURES)
             
@@ -175,6 +180,7 @@ if __name__ == "__main__":
                 color_col='z_position_gap', 
                 width=900, height=700
             )
+            fig_3d_constrained.update_layout(plot_bgcolor='white', paper_bgcolor='white')
             save_figure(fig_3d_constrained, f"{config['name'].lower()}_3d_parameter_space_constrained", 
                         output_dir=OUTPUT_DIR_FIGURES)
             
@@ -184,6 +190,7 @@ if __name__ == "__main__":
                 simulation_results=constrained_df,
                 min_rate=constrained_floor_rate
             )
+            fig_derived_corr.update_layout(plot_bgcolor='white', paper_bgcolor='white')
             save_figure(fig_derived_corr, f"{config['name'].lower()}_derived_metric_correlations", 
                         output_dir=OUTPUT_DIR_FIGURES)
         
@@ -222,7 +229,9 @@ if __name__ == "__main__":
                 subtitle=dict(
                     text=f"p={p}, μ_disadv={mu_disadv}, z_gap={z_position_gap}, c_disadv={c_disadv}, c_adv={c_adv}"
                 )
-            )
+            ),
+            plot_bgcolor='white',
+            paper_bgcolor='white'
         )
         save_figure(stratification_fig, f"{config['name'].lower()}_stratification_distribution", 
                     output_dir=OUTPUT_DIR_FIGURES)
@@ -280,7 +289,9 @@ if __name__ == "__main__":
                 subtitle=dict(
                     text=f"γ={gamma_position_rate}, target_rate={target_avg_rate}, floor_rate={floor_rate}"
                 )
-            )
+            ),
+            plot_bgcolor='white',
+            paper_bgcolor='white'
         )
         save_figure(position_to_rate_fig_with_floor, f"{config['name'].lower()}_position_to_rate_function_with_floor", 
                     output_dir=OUTPUT_DIR_FIGURES)
@@ -337,7 +348,9 @@ if __name__ == "__main__":
                 subtitle=dict(
                     text=f"γ={gamma_position_rate}, target_rate={target_avg_rate}, floor_rate={no_floor_rate}"
                 )
-            )
+            ),
+            plot_bgcolor='white',
+            paper_bgcolor='white'
         )
         save_figure(position_to_rate_fig_no_floor, f"{config['name'].lower()}_position_to_rate_function_no_floor", 
                     output_dir=OUTPUT_DIR_FIGURES)
@@ -378,7 +391,9 @@ if __name__ == "__main__":
                 subtitle=dict(
                     text=f"p={p}, γ={gamma_interaction}, z_gap={z_position_gap}, target_rate={target_avg_rate}, floor_rate={floor_rate}"
                 )
-            )
+            ),
+            plot_bgcolor='white',
+            paper_bgcolor='white'
         )
         save_figure(incarceration_fig, f"{config['name'].lower()}_incarceration_rate_interaction", 
                     output_dir=OUTPUT_DIR_FIGURES)
