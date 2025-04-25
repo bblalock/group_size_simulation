@@ -1,6 +1,6 @@
 import numpy as np
 from model.direct_effect import (
-    standard_model_incarceration_rate,
+    direct_pathway_model_incarceration_rate,
 )
 from visualization.plots import (
     create_explanatory_visual,
@@ -24,7 +24,7 @@ if __name__ == "__main__":
     and various disparity parameters affect measured inequality in incarceration rates.
     """
     # Define parameter ranges
-    p_values = np.round(np.arange(0.1, 1, 0.01), 2)  # Group proportion values from 0.1 to 1.0 with 100 values
+    p_values = np.round(np.arange(0.01, 1, 0.01), 2)  # Group proportion values from 0.1 to 1.0 with 100 values
     d_values = np.linspace(1, 10, 30)   # Disparity ratio values with 100 values
     avg_rate_values = np.linspace(50, 500, 100)  # Rate values per 100,000 with 100 values
 
@@ -35,7 +35,7 @@ if __name__ == "__main__":
     model_configs = [
         {
             'name': 'Standard',
-            'function': standard_model_incarceration_rate,
+            'function': direct_pathway_model_incarceration_rate,
             'param_dict': dict(p=p_values, avg_rate=avg_rate_values, d=d_values)
         },
     ]

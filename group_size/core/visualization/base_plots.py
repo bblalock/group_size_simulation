@@ -11,8 +11,6 @@ def create_3d_scatter(df,
                       y_col, 
                       z_col, 
                       color_col=None, 
-                      height=800,
-                      width=1000,
                       **kwargs
                       ):
     """
@@ -45,6 +43,22 @@ def create_3d_scatter(df,
         color=color_col,
         **kwargs
     )
+    
+    # Make the colorbar horizontal
+    if color_col is not None:
+        fig.update_layout(
+            coloraxis=dict(
+                colorbar=dict(
+                    orientation='h',
+                    yanchor='bottom',
+                    y=-0.2,
+                    xanchor='center',
+                    x=0.5,
+                    len=0.8
+                )
+            )
+        )
+    
     return fig
 
 @plotly_theme_decorator
