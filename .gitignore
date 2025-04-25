@@ -49,6 +49,7 @@ venv.bak/
 *.feather
 # Uncomment if you want to include data files in your repo
 !group_size/indirect_pathway/output/data/*.csv
+group_size/.heroku_deploy_commands.txt
 # !data/*.xlsx
 
 # Figures and outputs
