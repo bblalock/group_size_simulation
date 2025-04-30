@@ -34,7 +34,7 @@ def plotly_theme_decorator(func):
             width=width,
             paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)',
-            margin=dict(l=0, r=0),
+            margin=dict(l=0, r=0, b=0),
         )
         return fig
     return wrapper

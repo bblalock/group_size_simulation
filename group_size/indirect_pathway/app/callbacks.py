@@ -5,7 +5,7 @@ import numpy as np
 
 from indirect_pathway.src.model.indirect_effect import generate_stratification_positions, calculate_incarceration_rates_normalized
 from indirect_pathway.src.visualization.plots import (
-    create_incarceration_rate_plot, create_stratification_plot, create_position_to_rate_plot,
+    create_mechanism_interaction_plot, create_stratification_plot, create_position_to_rate_plot,
     plot_parameter_metric_correlations,
     plot_derived_metric_correlations,
     create_disparity_probability_plot,
@@ -26,11 +26,10 @@ def register_callbacks(app, simulation_results):
          Input('c-disadv-slider', 'value'),
          Input('c-adv-slider', 'value'),
          Input('gamma-slider', 'value'),
-         Input('target-rate-slider', 'value'),
          Input('floor-rate-slider', 'value'),
          Input('population-average-rate-slider', 'value')]
     )
-    def update_graph(sample_size, p, mu_disadv, z_position_gap, c_disadv, c_adv, gamma, target_avg_rate, floor_rate, population_avg_rate):
+    def update_graph(sample_size, p, mu_disadv, z_position_gap, c_disadv, c_adv, gamma, floor_rate, population_avg_rate):
         # Generate positions
         positions = generate_stratification_positions(
             p=p,
@@ -85,7 +84,7 @@ def register_callbacks(app, simulation_results):
         }
         
         # Create plots
-        incarceration_fig = create_incarceration_rate_plot(
+        incarceration_fig = create_mechanism_interaction_plot(
             rate_data=rate_data,
             gamma=gamma,
             target_avg_rate=population_avg_rate,
@@ -154,9 +153,11 @@ def register_callbacks(app, simulation_results):
          Output('simulation-3d-plot', 'figure')],
         [Input('param-space-floor-rate-slider', 'value'),
          Input('z-axis-variable-dropdown', 'value'),
-         Input('color-variable-dropdown', 'value')]
+         Input('color-variable-dropdown', 'value'),
+         Input('correlation-method-switch', 'value')
+         ]
     )
-    def update_parameter_space_plots(floor_rate, z_axis_variable, color_variable):
+    def update_parameter_space_plots(floor_rate, z_axis_variable, color_variable, correlation_method):
         # You'll need to load or generate simulation_results here
         # This should be your DataFrame containing the simulation results
         # For now, I'll assume it's loaded from somewhere
@@ -164,12 +165,14 @@ def register_callbacks(app, simulation_results):
         # Create all plots
         param_corr = plot_parameter_metric_correlations(
             simulation_results=simulation_results,
-            min_rate=floor_rate
+            floor_rate=floor_rate,
+            spearman=correlation_method
         )
         
         derived_corr = plot_derived_metric_correlations(
             simulation_results=simulation_results,
-            min_rate=floor_rate
+            min_rate=floor_rate,
+            spearman=correlation_method
         )
         
         prob_plot = create_disparity_probability_plot(

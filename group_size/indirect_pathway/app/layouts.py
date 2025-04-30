@@ -55,7 +55,6 @@ def create_controls_card():
                     min=1, max=50, step=1, value=20,
                     marks={i: str(i) for i in range(0, 51, 10)},
                 ),
-
                 # Incarceration rate parameters
                 html.H5("Incarceration Rate Parameters"),
                 html.Label("Shape Parameter (γ):"),
@@ -63,12 +62,6 @@ def create_controls_card():
                     id='gamma-slider',
                     min=0, max=5, step=0.1, value=1,
                     marks={i: str(i) for i in range(0, 6)},
-                ),
-                html.Label("Target Average Rate (per 100,000):"),
-                dcc.Slider(
-                    id='target-rate-slider',
-                    min=100, max=1000, step=50, value=500,
-                    marks={i: str(i) for i in range(100, 1001, 200)},
                 ),
                 html.Label("Incarceration Rate Floor (per 100,000):"),
                 dcc.Slider(
@@ -296,7 +289,6 @@ def create_parameter_space_analysis_tab(simulation_results):
 Our simulation explores how key parameters affect observed disparities in incarceration rates. We focus on four critical parameters while holding others constant to isolate their effects:
 
 1. **Group proportion**: $p \\in (0.01, 0.99)$ with increments of 0.05
-1. **Group proportion**: $p \\in (0.01, 0.99)$ with increments of 0.05
    - Represents the proportion of the disadvantaged group in the population
    - Allows us to examine how group size affects disparity metrics
 
@@ -387,6 +379,16 @@ The contrast between the unconstrained and constrained models reveals important 
                 dbc.Card([
                     dbc.CardHeader("Parameter Correlations"),
                     dbc.CardBody([
+                        dbc.Row([
+                            dbc.Col([
+                                html.Label("Correlation Method:"),
+                                dbc.Switch(
+                                    id='correlation-method-switch',
+                                    label="Use Spearman's Correlation",
+                                    value=True
+                                ),
+                            ], width=6),
+                        ], className="mb-3"),
                         html.P([
                             "These heatmaps show correlations between model parameters and outcome metrics. ",
                             "In the unconstrained model, position gap shows the strongest positive correlation with disparity measures (>0.7), ",
@@ -424,7 +426,6 @@ The contrast between the unconstrained and constrained models reveals important 
                         ], start_collapsed=True)
                     ])
                 ], color="secondary", outline=False),
-                
                 # Probability plot and 3D scatter plot in the same row
                 dbc.Row([
                     # Probability plot card

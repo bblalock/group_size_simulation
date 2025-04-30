@@ -7,7 +7,7 @@ from scipy.stats import beta
 
 from core.visualization.base_plots import create_3d_scatter
 from core.visualization.style import plotly_theme_decorator
-from indirect_pathway.src.model.indirect_effect import normalize_rates_to_target
+from indirect_pathway.src.model.indirect_effect import normalize_rates_to_target, apply_floor_constraint
 
 # Global legend group names
 DISADV_GROUP = "Disadvantaged"
@@ -98,46 +98,8 @@ def create_stratification_plot(positions, num_bins=100, **kwargs):
     return fig
 
 
-def calculate_rates_with_floor(x_curve, gamma, target_avg_rate, floor_rate=0):
-    """
-    Calculate rates for a given curve, applying floor and normalization if needed.
-
-    Parameters:
-    -----------
-    x_curve : numpy.ndarray
-        Array of x positions to calculate rates for
-    gamma : float
-        Shape parameter controlling relationship between position and incarceration rate
-    target_avg_rate : float
-        Target population-average incarceration rate
-    floor_rate : float, optional
-        Minimum incarceration rate before normalization (default=0)
-
-    Returns:
-    --------
-    numpy.ndarray
-        Array of final calculated rates
-    """
-    # Calculate base position effect: (1-z)^gamma for all positions
-    all_effects = np.power(1 - x_curve, gamma)
-
-    # Calculate initial rates
-    initial_rates = target_avg_rate * all_effects / np.mean(all_effects)
-
-    # Apply floor if specified
-    if floor_rate > 0:
-        rates_with_floor = np.maximum(floor_rate, initial_rates)
-        # Normalize to maintain target average
-        final_rates, _ = normalize_rates_to_target(
-            rates_with_floor, target_avg_rate)
-    else:
-        final_rates = initial_rates
-
-    return final_rates
-
-
 @plotly_theme_decorator
-def create_position_to_rate_plot(gamma, target_avg_rate, floor_rate=0, norm_factors=None, **kwargs):
+def create_position_to_rate_plot(gamma, target_avg_rate, norm_factors, floor_rate=0, **kwargs):
     """
     Creates a plot showing how position maps to incarceration rate
 
@@ -167,17 +129,12 @@ def create_position_to_rate_plot(gamma, target_avg_rate, floor_rate=0, norm_fact
         base_effects = np.power(1 - x_curve, gamma + g_delta)
         
         # Apply normalization factors
-        if norm_factors:
-            nf = norm_factors[g_key]['factors']
-            initial_rates = target_avg_rate * base_effects * nf['first_norm_factor']
-            
-            # Apply floor and second normalization
-            rates_with_floor = np.maximum(floor_rate, initial_rates)
-            final_rates = rates_with_floor * nf['second_norm_factor']
-        else:
-            # Fallback to original calculation if norm_factors not provided
-            final_rates = calculate_rates_with_floor(x_curve, float(g_key.replace('gamma', '')) + gamma, 
-                                                   target_avg_rate, floor_rate)
+        nf = norm_factors[g_key]['factors']
+        initial_rates = target_avg_rate * base_effects * nf['first_norm_factor']
+        
+        # Apply floor and second normalization
+        rates_with_floor = apply_floor_constraint(initial_rates, floor_rate)
+        final_rates = rates_with_floor * nf['second_norm_factor']
         
         # Add to dataframe
         curves_data.extend([{
@@ -256,7 +213,7 @@ def create_position_to_rate_plot(gamma, target_avg_rate, floor_rate=0, norm_fact
 
 
 @plotly_theme_decorator
-def create_incarceration_rate_plot(rate_data, gamma, target_avg_rate, positions, norm_factors=None, **kwargs):
+def create_mechanism_interaction_plot(rate_data, gamma, target_avg_rate, positions, norm_factors, **kwargs):
     """Creates a plot of incarceration rates with position markers and group boxplots"""
     # Create figure with marginal box plots
     fig = make_subplots(
@@ -291,13 +248,10 @@ def create_incarceration_rate_plot(rate_data, gamma, target_avg_rate, positions,
     base_effects = np.power(1 - x_curve, gamma)
     
     # Apply the empirical normalization factors
-    if norm_factors:
-        initial_rates = target_avg_rate * base_effects * norm_factors['first_norm_factor']
-        rates_with_floor = np.maximum(floor_rate, initial_rates)
-        y_curve = rates_with_floor * norm_factors['second_norm_factor']
-    else:
-        # Fallback to original calculation if norm_factors not provided
-        y_curve = calculate_rates_with_floor(x_curve, gamma, target_avg_rate, floor_rate)
+    initial_rates = target_avg_rate * base_effects * norm_factors['first_norm_factor']
+    rates_with_floor = apply_floor_constraint(initial_rates, floor_rate)
+    y_curve = rates_with_floor * norm_factors['second_norm_factor']
+    
     
     # Add the theoretical curve
     fig.add_trace(
@@ -362,7 +316,7 @@ def create_incarceration_rate_plot(rate_data, gamma, target_avg_rate, positions,
     # Add target/population average line to box plot
     fig.add_trace(
         go.Scatter(
-            x=[0, 1],
+            x=[DISADV_GROUP, ADV_GROUP],
             y=[pop_avg_rate, pop_avg_rate],
             mode='lines',
             name=f'Population Average ({pop_avg_rate:.1f})',
@@ -380,7 +334,8 @@ def create_incarceration_rate_plot(rate_data, gamma, target_avg_rate, positions,
             marker_color='red',
             boxmean=True,
             legendgroup=DISADV_GROUP,
-            showlegend=False
+            showlegend=False,
+            x=[DISADV_GROUP]  # Use group name as discrete x value
         ),
         row=2, col=1
     )
@@ -393,7 +348,8 @@ def create_incarceration_rate_plot(rate_data, gamma, target_avg_rate, positions,
             marker_color='blue',
             boxmean=True,
             legendgroup=ADV_GROUP,
-            showlegend=False
+            showlegend=False,
+            x=[ADV_GROUP]  # Use group name as discrete x value
         ),
         row=2, col=1
     )
@@ -431,6 +387,16 @@ def create_incarceration_rate_plot(rate_data, gamma, target_avg_rate, positions,
     fig.update_yaxes(
         title_text='Incarceration Rate (per 100,000)', row=2, col=1)
     fig.update_xaxes(row=1, col=2, showgrid=True)
+    
+    # Update x-axis for boxplots to be categorical
+    fig.update_xaxes(
+        row=2, 
+        col=1, 
+        type='category',  # Set as categorical axis
+        categoryorder='array',  # Preserve the order
+        categoryarray=[DISADV_GROUP, ADV_GROUP]  # Define the order
+    )
+    
     fig.update_yaxes(title_text='Frequency', row=1, col=2, showgrid=False)
     fig.update_yaxes(title_text='Density', row=1, col=2,
                      secondary_y=True, showgrid=False)
@@ -439,13 +405,14 @@ def create_incarceration_rate_plot(rate_data, gamma, target_avg_rate, positions,
     return fig
 
 @plotly_theme_decorator
-def plot_parameter_metric_correlations(simulation_results, min_rate=0):
+def plot_parameter_metric_correlations(simulation_results, floor_rate=0, spearman=True):
     """
     Creates a heatmap showing correlations between variable parameters and derived metrics.
     
     Args:
         simulation_results (pd.DataFrame): The simulation results dataframe
-        min_rate (int, optional): The minimum rate to filter by. Defaults to 0.
+        floor_rate (int, optional): The minimum rate to filter by. Defaults to 0.
+        spearman (bool, optional): Whether to use Spearman correlation. If False, uses Pearson. Defaults to True.
         
     Returns:
         plotly.graph_objects.Figure: The correlation heatmap figure
@@ -455,7 +422,6 @@ def plot_parameter_metric_correlations(simulation_results, min_rate=0):
         'prop_disadv',  # Same as 'p'
         'gamma',
         'z_position_gap',
-        # 'min_rate'  # This is floor_rate_values in simulation.py
     ]
 
     # Derived metrics (calculated from the simulation results)
@@ -470,13 +436,14 @@ def plot_parameter_metric_correlations(simulation_results, min_rate=0):
     ]
 
     # Filter data for a specific min_rate to focus analysis
-    plot_df = simulation_results[simulation_results['min_rate']==min_rate]
+    plot_df = simulation_results[simulation_results['min_rate']==floor_rate]
 
     # Create a non-square correlation matrix with variable parameters as rows and derived metrics as columns
     var_derived_corr = pd.DataFrame(index=variable_params, columns=derived_metrics)
+    method = 'spearman' if spearman else 'pearson'
     for param in variable_params:
         for metric in derived_metrics:
-            var_derived_corr.loc[param, metric] = plot_df[param].corr(plot_df[metric])
+            var_derived_corr.loc[param, metric] = plot_df[param].corr(plot_df[metric], method=method)
 
     # Create a heatmap for variable parameters vs derived metrics (non-square matrix)
     fig = go.Figure(data=go.Heatmap(
@@ -489,11 +456,16 @@ def plot_parameter_metric_correlations(simulation_results, min_rate=0):
         text=np.round(var_derived_corr.values.astype(float), 2),
         texttemplate='%{text:.2f}',
         hoverinfo='text',
-        colorbar=dict(title='Correlation'),
+        colorbar=dict(title=f'{method.capitalize()} Correlation'),
     ))
 
     fig.update_layout(
-        title=f'Correlation Between Variable Parameters and Derived Metrics (min_rate={min_rate})',
+        title=dict(
+            text="Parameter-Metric Correlation Matrix",
+            subtitle=dict(
+                text=f"{method.capitalize()} Correlation, Floor Rate={floor_rate}"
+            )
+        ),
         title_font_size=16,
         width=700,
         height=500,
@@ -510,13 +482,14 @@ def plot_parameter_metric_correlations(simulation_results, min_rate=0):
     return fig
 
 @plotly_theme_decorator
-def plot_derived_metric_correlations(simulation_results, min_rate=0):
+def plot_derived_metric_correlations(simulation_results, min_rate=0, spearman=True):
     """
     Creates a heatmap showing correlations among derived metrics.
     
     Args:
         simulation_results (pd.DataFrame): The simulation results dataframe
         min_rate (int, optional): The minimum rate to filter by. Defaults to 0.
+        spearman (bool, optional): Whether to use Spearman correlation. If False, uses Pearson. Defaults to True.
         
     Returns:
         plotly.graph_objects.Figure: The correlation heatmap figure
@@ -536,7 +509,8 @@ def plot_derived_metric_correlations(simulation_results, min_rate=0):
     plot_df = simulation_results[simulation_results['min_rate']==min_rate]
 
     # Create a correlation matrix for derived metrics only
-    derived_corr = plot_df[derived_metrics].corr()
+    method = 'spearman' if spearman else 'pearson'
+    derived_corr = plot_df[derived_metrics].corr(method=method)
     mask = np.triu(np.ones_like(derived_corr, dtype=bool))
     derived_corr_masked = derived_corr.copy()
     derived_corr_masked.values[mask] = None
@@ -552,11 +526,16 @@ def plot_derived_metric_correlations(simulation_results, min_rate=0):
         text=np.where(np.isnan(derived_corr_masked.values), '', np.round(derived_corr_masked.values, 2)),
         texttemplate='%{text:.2f}',
         hoverinfo='text',
-        colorbar=dict(title='Correlation'),
+        colorbar=dict(title=f'{method.capitalize()} Correlation'),
     ))
 
     fig.update_layout(
-        title=f'Correlation Among Derived Metrics (min_rate={min_rate})',
+        title=dict(
+            text="Derived Metrics Correlation Matrix",
+            subtitle=dict(
+                text=f"{method.capitalize()} Correlation, Floor Rate={min_rate}"
+            )
+        ),
         title_font_size=16,
         width=700,
         height=500,
@@ -594,7 +573,8 @@ def create_disparity_probability_plot(simulation_results, min_rate_value=None):
     
     # Calculate probability of each bucket for each prop_disadv value
     # This aggregates across all gamma and position gap values
-    prob_df = (plot_df.groupby(['prop_disadv', 'disparity_bucket'])
+    prob_df = (plot_df
+               .groupby(['prop_disadv', 'disparity_bucket'], observed=False)
                .size()
                .unstack(fill_value=0))
 

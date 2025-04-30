@@ -35,7 +35,7 @@ Where the beta distribution parameters are derived using the mean-concentration 
 
 The mean position of the disadvantaged group ($\mu_{disadv}$) is lower than that of the advantaged group ($\mu_{adv}$), with the difference controlled by the position gap parameter:
 
-$\mu_{adv} = \mu_{disadv} + z\_position\_gap$
+$\mu_{adv} = \mu_{disadv} + z\\_position\\_gap$
 
 The concentration parameters ($c_{disadv}$ and $c_{adv}$) control how tightly each group clusters around its mean position, with higher values creating more peaked, narrower distributions.
 
@@ -111,7 +111,7 @@ Our simulation explores how key parameters affect observed disparities in incarc
    - Represents the proportion of the disadvantaged group in the population
    - Allows us to examine how group size affects disparity metrics
 
-2. **Position gap between groups**: $z\_position\_gap \in \{0, 0.2, 0.4, 0.6, 0.8\}$
+2. **Position gap between groups**: $z\\_position\\_gap \in \{0, 0.2, 0.4, 0.6, 0.8\}$
    - The difference between mean positions of advantaged and disadvantaged groups
    - Represents structural stratification in society
 
@@ -150,7 +150,7 @@ The Normalized Disparity Index (η) effectively measures how close the advantage
 
 Our analysis of the unconstrained model (without floor rate) reveals several important insights:
 
-1. **Position gap dominance**: The position gap between groups ($z\_position\_gap$) is the strongest determinant of disparity levels, with higher gaps producing greater disparities.
+1. **Position gap dominance**: The position gap between groups ($z\\_position\\_gap$) is the strongest determinant of disparity levels, with higher gaps producing greater disparities.
 
 2. **Gamma amplification effect**: Higher values of the shape parameter (γ) amplify disparities non-linearly, especially when combined with larger position gaps.
 

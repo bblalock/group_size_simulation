@@ -17,7 +17,7 @@ from indirect_pathway.src.visualization.plots import (
     create_simulation_3d_plot,
     create_stratification_plot,
     create_position_to_rate_plot,
-    create_incarceration_rate_plot
+    create_mechanism_interaction_plot
 )
 
 
@@ -50,6 +50,8 @@ if __name__ == "__main__":
     
     # Minimum incarceration rate (floor) - varies the baseline risk
     floor_rate_values = np.linspace(0, 500, 20)
+    floor_rate_values = [0, 1] + list(floor_rate_values[1:])
+    print(floor_rate_values)
     
     # FIXED PARAMETERS (held constant across simulations)
     # ----------------------------------
@@ -117,7 +119,7 @@ if __name__ == "__main__":
         if not unconstrained_df.empty:
             fig_corr_unconstrained = plot_parameter_metric_correlations(
                 simulation_results=unconstrained_df,
-                min_rate=0
+                floor_rate=0
             )
             fig_corr_unconstrained.update_layout(plot_bgcolor='white', paper_bgcolor='white')
             save_figure(fig_corr_unconstrained, f"{config['name'].lower()}_correlation_heatmap_unconstrained", 
@@ -165,7 +167,7 @@ if __name__ == "__main__":
             print(f"Generating parameter-metric correlation heatmap (floor_rate={constrained_floor_rate})...")
             fig_corr_constrained = plot_parameter_metric_correlations(
                 simulation_results=constrained_df,
-                min_rate=constrained_floor_rate
+                floor_rate=constrained_floor_rate
             )
             fig_corr_constrained.update_layout(plot_bgcolor='white', paper_bgcolor='white')
             save_figure(fig_corr_constrained, f"{config['name'].lower()}_correlation_heatmap_constrained", 
@@ -376,7 +378,7 @@ if __name__ == "__main__":
             return_only_factors=True
         )
         
-        incarceration_fig = create_incarceration_rate_plot(
+        incarceration_fig = create_mechanism_interaction_plot(
             rate_data=rate_data,
             gamma=gamma_interaction,
             target_avg_rate=target_avg_rate,
