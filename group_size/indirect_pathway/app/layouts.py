@@ -171,13 +171,18 @@ Where:
 
 ### Normalized Model with Floor Rate
 
-We further extend the model by introducing a minimum incarceration rate (floor) in a three-step process:
+We extend the model by introducing a minimum incarceration rate (floor) through a three-step process:
 
-1. Calculate initial rates using the normalized model
-2. Apply floor rate constraint: $\\text{RateWithFloor}(z) = \\max(\\text{floorRate}, \\text{InitialRate}(z))$
-3. Apply second normalization to maintain target average: $\\text{FinalRate}(z) = \\text{RateWithFloor}(z) \\cdot \\frac{\\text{targetAvgRate}}{E[\\text{RateWithFloor}(Z)]}$
+1. Calculate initial rates using the normalized model:
+   $$\\text{InitialRate}(z) = \\text{targetAvgRate} \\cdot \\frac{(1-z)^{\\gamma}}{E[(1-Z)^{\\gamma}]}$$
 
-This two-step normalization process is critical for maintaining comparable scenarios across simulation runs. When we add a floor, we potentially increase the average rate, so the second normalization factor adjusts all rates proportionally downward to maintain the target average.
+2. Add the floor rate to shift the function upward:
+   $$\\text{RateWithFloor}(z) = \\text{InitialRate}(z) + \\text{floorRate}$$
+
+3. Apply second normalization to maintain target average:
+   $$\\text{FinalRate}(z) = \\text{RateWithFloor}(z) \\cdot \\frac{\\text{targetAvgRate}}{E[\\text{RateWithFloor}(Z)]}$$
+
+This two-step normalization process is critical for maintaining comparable scenarios across simulation runs. When we add a floor by shifting the function upward, we increase the average rate, so the second normalization factor adjusts all rates proportionally downward to maintain the target average. Unlike a hard floor constraint that creates a discontinuity, this approach preserves the smooth shape of the incarceration rate function while ensuring a minimum level of risk.
 ''', mathjax=True, style={'color': 'white'})
                                          ])
                                      ], color="dark", inverse=True, className="mt-3")

@@ -335,7 +335,6 @@ def create_mechanism_interaction_plot(rate_data, gamma, target_avg_rate, positio
             boxmean=True,
             legendgroup=DISADV_GROUP,
             showlegend=False,
-            x=[DISADV_GROUP]  # Use group name as discrete x value
         ),
         row=2, col=1
     )
@@ -349,7 +348,6 @@ def create_mechanism_interaction_plot(rate_data, gamma, target_avg_rate, positio
             boxmean=True,
             legendgroup=ADV_GROUP,
             showlegend=False,
-            x=[ADV_GROUP]  # Use group name as discrete x value
         ),
         row=2, col=1
     )
