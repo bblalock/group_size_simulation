@@ -151,26 +151,47 @@ def normalize_rates_to_target(rates, target_avg_rate):
     
     return normalized_rates, norm_factor
 
-def calculate_normalization_factors(all_positions, gamma, target_avg_rate, floor_rate=0):
+def apply_floor_constraint(rates, floor_rate=0, shift_mode=True):
     """
-    Calculate normalization factors for a specific gamma value and population distribution.
+    Apply a floor constraint to rates, either as a hard floor or by shifting the function.
     
     Parameters:
     -----------
-    all_positions : numpy.ndarray
-        Array of positions for the entire population
-    gamma : float
-        Shape parameter controlling relationship between position and incarceration rate
-    target_avg_rate : float
-        Target population-average incarceration rate
+    rates : numpy.ndarray
+        Array of rates to apply floor to
     floor_rate : float, optional
-        Minimum incarceration rate before normalization (default=0)
+        Minimum rate value (default=0)
+    shift_mode : bool, optional
+        If True, shift the entire curve up by adding the difference needed to reach floor_rate
+        If False, apply a hard floor: max(floor_rate, rates)
         
     Returns:
     --------
-    dict
-        Dictionary with normalization factors and intermediate values
+    numpy.ndarray
+        Array of rates with floor constraint applied
     """
+    if floor_rate <= 0:
+        return rates
+    
+    if shift_mode:
+        # Shift everything up by the floor rate
+        rates_with_floor = rates + floor_rate
+    else:
+        # Apply a hard floor: max(floor_rate, rates)
+        rates_with_floor = np.maximum(floor_rate, rates)
+    
+    return rates_with_floor
+
+def calculate_incarceration_rates_normalized(positions, gamma, target_avg_rate, floor_rate=0, return_only_factors=False):
+    """
+    Calculate incarceration rates based on positions in the stratification dimension
+    using the normalized approach to maintain a constant population-average rate.
+    """
+    # Extract positions for each group
+    positions_disadv = positions['positions_disadv']
+    positions_adv = positions['positions_adv']
+    all_positions = positions['positions'] if 'positions' in positions else np.concatenate([positions_disadv, positions_adv])
+    
     # Calculate base position effect: (1-z)^gamma for all positions
     all_base_effects = np.power(1 - all_positions, gamma)
     
@@ -183,72 +204,21 @@ def calculate_normalization_factors(all_positions, gamma, target_avg_rate, floor
     
     # Apply floor if specified
     if floor_rate > 0:
-        # Apply floor to all rates
-        rates_with_floor_all = np.maximum(floor_rate, initial_rates_all)
+        # Apply floor to all rates using apply_floor_constraint
+        rates_with_floor_all = apply_floor_constraint(initial_rates_all, floor_rate)
         
         # Second normalization: adjust to maintain target average after applying floor
-        _, second_norm_factor = normalize_rates_to_target(
-            rates_with_floor_all, target_avg_rate
-        )
-        
-        # Calculate total normalization factor
-        total_norm_factor = first_norm_factor * second_norm_factor
-        
-        # Calculate effective floor after normalization
-        effective_floor = floor_rate * second_norm_factor
+        _, second_norm_factor = normalize_rates_to_target(rates_with_floor_all, target_avg_rate)
     else:
         # No floor needed
         second_norm_factor = 1
-        total_norm_factor = first_norm_factor
-        effective_floor = 0
-    
-    return {
-        'all_base_effects': all_base_effects,
-        'expected_effect': expected_effect,
-        'first_norm_factor': first_norm_factor,
-        'second_norm_factor': second_norm_factor,
-        'total_norm_factor': total_norm_factor,
-        'initial_rates_all': initial_rates_all,
-        'effective_floor': effective_floor
-    }
-
-def calculate_incarceration_rates_normalized(positions, gamma, target_avg_rate, floor_rate=0, return_only_factors=False):
-    """
-    Calculate incarceration rates based on positions in the stratification dimension
-    using the normalized approach to maintain a constant population-average rate.
-    
-    Parameters:
-    -----------
-    positions : dict
-        Dictionary with positions and group assignments from generate_stratification_positions
-    gamma : float
-        Shape parameter controlling relationship between position and incarceration rate
-    target_avg_rate : float
-        Target population-average incarceration rate (per 100,000)
-    floor_rate : float, optional
-        Minimum incarceration rate before normalization (default=0)
-    return_only_factors : bool, optional
-        If True, only return normalization factors without calculating rates
-        
-    Returns:
-    --------
-    dict
-        Dictionary with incarceration rates for both groups or just normalization factors
-    """
-    # Extract positions for each group
-    positions_disadv = positions['positions_disadv']
-    positions_adv = positions['positions_adv']
-    all_positions = positions['positions'] if 'positions' in positions else np.concatenate([positions_disadv, positions_adv])
-    
-    # Calculate normalization factors
-    norm_data = calculate_normalization_factors(all_positions, gamma, target_avg_rate, floor_rate)
     
     # If we only need factors, return them now
     if return_only_factors:
         return {
-            'first_norm_factor': norm_data['first_norm_factor'],
-            'second_norm_factor': norm_data['second_norm_factor'],
-            'total_norm_factor': norm_data['total_norm_factor']
+            'first_norm_factor': first_norm_factor,
+            'second_norm_factor': second_norm_factor,
+            'total_norm_factor': first_norm_factor * second_norm_factor
         }
     
     # Calculate base position effect for each group
@@ -256,17 +226,18 @@ def calculate_incarceration_rates_normalized(positions, gamma, target_avg_rate, 
     adv_base_effects = np.power(1 - positions_adv, gamma)
     
     # Apply normalization factors to calculate rates
-    initial_rates_disadv = target_avg_rate * disadv_base_effects * norm_data['first_norm_factor']
-    initial_rates_adv = target_avg_rate * adv_base_effects * norm_data['first_norm_factor']
+    initial_rates_disadv = target_avg_rate * disadv_base_effects * first_norm_factor
+    initial_rates_adv = target_avg_rate * adv_base_effects * first_norm_factor
     
     # Apply floor if needed
     if floor_rate > 0:
-        rates_with_floor_disadv = np.maximum(floor_rate, initial_rates_disadv)
-        rates_with_floor_adv = np.maximum(floor_rate, initial_rates_adv)
+        # Apply floor using apply_floor_constraint (using the same approach as used for calculating factors)
+        rates_with_floor_disadv = apply_floor_constraint(initial_rates_disadv, floor_rate)
+        rates_with_floor_adv = apply_floor_constraint(initial_rates_adv, floor_rate)
         
         # Apply second normalization
-        rates_disadv = rates_with_floor_disadv * norm_data['second_norm_factor']
-        rates_adv = rates_with_floor_adv * norm_data['second_norm_factor']
+        rates_disadv = rates_with_floor_disadv * second_norm_factor
+        rates_adv = rates_with_floor_adv * second_norm_factor
     else:
         rates_disadv = initial_rates_disadv
         rates_adv = initial_rates_adv
@@ -289,12 +260,13 @@ def calculate_incarceration_rates_normalized(positions, gamma, target_avg_rate, 
         'rates_disadv': rates_disadv,
         'rates_adv': rates_adv,
         'pop_avg_rate': np.mean(np.concatenate([rates_disadv, rates_adv])),
-        'first_norm_factor': norm_data['first_norm_factor'],
-        'second_norm_factor': norm_data['second_norm_factor'],
-        'total_norm_factor': norm_data['total_norm_factor'],
+        'first_norm_factor': first_norm_factor,
+        'second_norm_factor': second_norm_factor,
+        'total_norm_factor': first_norm_factor * second_norm_factor,
         'floor_rate': floor_rate,
-        'effective_floor': norm_data['effective_floor']
+        'effective_floor': floor_rate * second_norm_factor
     }
+    
 def indirect_model_incarceration_rate(
     group, 
     p, 

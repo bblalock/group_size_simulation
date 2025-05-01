@@ -55,7 +55,6 @@ def create_controls_card():
                     min=1, max=50, step=1, value=20,
                     marks={i: str(i) for i in range(0, 51, 10)},
                 ),
-
                 # Incarceration rate parameters
                 html.H5("Incarceration Rate Parameters"),
                 html.Label("Shape Parameter (γ):"),
@@ -63,12 +62,6 @@ def create_controls_card():
                     id='gamma-slider',
                     min=0, max=5, step=0.1, value=1,
                     marks={i: str(i) for i in range(0, 6)},
-                ),
-                html.Label("Target Average Rate (per 100,000):"),
-                dcc.Slider(
-                    id='target-rate-slider',
-                    min=100, max=1000, step=50, value=500,
-                    marks={i: str(i) for i in range(100, 1001, 200)},
                 ),
                 html.Label("Incarceration Rate Floor (per 100,000):"),
                 dcc.Slider(
@@ -178,13 +171,18 @@ Where:
 
 ### Normalized Model with Floor Rate
 
-We further extend the model by introducing a minimum incarceration rate (floor) in a three-step process:
+We extend the model by introducing a minimum incarceration rate (floor) through a three-step process:
 
-1. Calculate initial rates using the normalized model
-2. Apply floor rate constraint: $\\text{RateWithFloor}(z) = \\max(\\text{floorRate}, \\text{InitialRate}(z))$
-3. Apply second normalization to maintain target average: $\\text{FinalRate}(z) = \\text{RateWithFloor}(z) \\cdot \\frac{\\text{targetAvgRate}}{E[\\text{RateWithFloor}(Z)]}$
+1. Calculate initial rates using the normalized model:
+   $$\\text{InitialRate}(z) = \\text{targetAvgRate} \\cdot \\frac{(1-z)^{\\gamma}}{E[(1-Z)^{\\gamma}]}$$
 
-This two-step normalization process is critical for maintaining comparable scenarios across simulation runs. When we add a floor, we potentially increase the average rate, so the second normalization factor adjusts all rates proportionally downward to maintain the target average.
+2. Add the floor rate to shift the function upward:
+   $$\\text{RateWithFloor}(z) = \\text{InitialRate}(z) + \\text{floorRate}$$
+
+3. Apply second normalization to maintain target average:
+   $$\\text{FinalRate}(z) = \\text{RateWithFloor}(z) \\cdot \\frac{\\text{targetAvgRate}}{E[\\text{RateWithFloor}(Z)]}$$
+
+This two-step normalization process is critical for maintaining comparable scenarios across simulation runs. When we add a floor by shifting the function upward, we increase the average rate, so the second normalization factor adjusts all rates proportionally downward to maintain the target average. Unlike a hard floor constraint that creates a discontinuity, this approach preserves the smooth shape of the incarceration rate function while ensuring a minimum level of risk.
 ''', mathjax=True, style={'color': 'white'})
                                          ])
                                      ], color="dark", inverse=True, className="mt-3")
@@ -296,7 +294,6 @@ def create_parameter_space_analysis_tab(simulation_results):
 Our simulation explores how key parameters affect observed disparities in incarceration rates. We focus on four critical parameters while holding others constant to isolate their effects:
 
 1. **Group proportion**: $p \\in (0.01, 0.99)$ with increments of 0.05
-1. **Group proportion**: $p \\in (0.01, 0.99)$ with increments of 0.05
    - Represents the proportion of the disadvantaged group in the population
    - Allows us to examine how group size affects disparity metrics
 
@@ -387,6 +384,16 @@ The contrast between the unconstrained and constrained models reveals important 
                 dbc.Card([
                     dbc.CardHeader("Parameter Correlations"),
                     dbc.CardBody([
+                        dbc.Row([
+                            dbc.Col([
+                                html.Label("Correlation Method:"),
+                                dbc.Switch(
+                                    id='correlation-method-switch',
+                                    label="Use Spearman's Correlation",
+                                    value=True
+                                ),
+                            ], width=6),
+                        ], className="mb-3"),
                         html.P([
                             "These heatmaps show correlations between model parameters and outcome metrics. ",
                             "In the unconstrained model, position gap shows the strongest positive correlation with disparity measures (>0.7), ",
@@ -424,7 +431,6 @@ The contrast between the unconstrained and constrained models reveals important 
                         ], start_collapsed=True)
                     ])
                 ], color="secondary", outline=False),
-                
                 # Probability plot and 3D scatter plot in the same row
                 dbc.Row([
                     # Probability plot card

@@ -35,7 +35,7 @@ Where the beta distribution parameters are derived using the mean-concentration 
 
 The mean position of the disadvantaged group ($\mu_{disadv}$) is lower than that of the advantaged group ($\mu_{adv}$), with the difference controlled by the position gap parameter:
 
-$\mu_{adv} = \mu_{disadv} + z\_position\_gap$
+$\mu_{adv} = \mu_{disadv} + z\\_position\\_gap$
 
 The concentration parameters ($c_{disadv}$ and $c_{adv}$) control how tightly each group clusters around its mean position, with higher values creating more peaked, narrower distributions.
 
@@ -76,22 +76,22 @@ Where:
 
 ### Normalized Model with Floor Rate
 
-We further extend the model by introducing a minimum incarceration rate (floor). This addresses the empirically suspect scenario of extremely low incarceration rates for advantaged groups. The floor is applied in a two-step process:
+We further extend the model by introducing a minimum incarceration rate (floor). This addresses the empirically suspect scenario of extremely low incarceration rates for advantaged groups. The floor is applied by shifting the entire incarceration rate function upward:
 
 **Step 1:** Calculate initial rates using the normalized model
 $$\text{InitialRate}(z) = targetAvgRate \cdot \frac{(1-z)^{\gamma}}{\mathbb{E}[(1-Z)^{\gamma}]}$$
 
-**Step 2:** Apply floor rate constraint
-$$\text{RateWithFloor}(z) = \max(floorRate, \text{InitialRate}(z))$$
+**Step 2:** Add the floor rate to shift the function upward
+$$\text{RateWithFloor}(z) = \text{InitialRate}(z) + floorRate$$
 
 **Step 3:** Apply second normalization to maintain target average
 $$\text{FinalRate}(z) = \text{RateWithFloor}(z) \cdot \frac{targetAvgRate}{\mathbb{E}[\text{RateWithFloor}(Z)]}$$
 
 Where:
-- $floorRate$ is the minimum allowed incarceration rate
+- $floorRate$ is the amount by which to shift the entire function upward
 - The second normalization factor $\frac{targetAvgRate}{\mathbb{E}[\text{RateWithFloor}(Z)]}$ ensures the population-average rate remains at $targetAvgRate$ after applying the floor
 
-This two-step normalization process is critical for maintaining comparable scenarios across simulation runs. When we add a floor, we potentially increase the average rate, so the second normalization factor adjusts all rates proportionally downward to maintain the target average.
+This two-step normalization process is critical for maintaining comparable scenarios across simulation runs. When we add a floor by shifting the function upward, we increase the average rate, so the second normalization factor adjusts all rates proportionally downward to maintain the target average. Unlike a hard floor constraint that creates a discontinuity, this approach preserves the smooth shape of the incarceration rate function while ensuring a minimum level of risk.
 
 ![Position-to-Rate Function with Floor](output/figures/normalized_indirect_position_to_rate_function_with_floor.png)
 *This graph shows the position-to-incarceration rate function with a floor rate of 100 per 100,000 applied. Multiple curves represent different γ values, with the horizontal line at the bottom showing where the floor rate creates a minimum threshold. Unlike the no-floor version, these curves are slightly compressed at the higher rate values to maintain the same population average. The γ=2 curve still shows the steepest decline, reaching approximately 1500 per 100,000 at the lowest positions before flattening to the floor rate at higher positions.*
@@ -111,7 +111,7 @@ Our simulation explores how key parameters affect observed disparities in incarc
    - Represents the proportion of the disadvantaged group in the population
    - Allows us to examine how group size affects disparity metrics
 
-2. **Position gap between groups**: $z\_position\_gap \in \{0, 0.2, 0.4, 0.6, 0.8\}$
+2. **Position gap between groups**: $z\\_position\\_gap \in \{0, 0.2, 0.4, 0.6, 0.8\}$
    - The difference between mean positions of advantaged and disadvantaged groups
    - Represents structural stratification in society
 
@@ -150,7 +150,7 @@ The Normalized Disparity Index (η) effectively measures how close the advantage
 
 Our analysis of the unconstrained model (without floor rate) reveals several important insights:
 
-1. **Position gap dominance**: The position gap between groups ($z\_position\_gap$) is the strongest determinant of disparity levels, with higher gaps producing greater disparities.
+1. **Position gap dominance**: The position gap between groups ($z\\_position\\_gap$) is the strongest determinant of disparity levels, with higher gaps producing greater disparities.
 
 2. **Gamma amplification effect**: Higher values of the shape parameter (γ) amplify disparities non-linearly, especially when combined with larger position gaps.
 
